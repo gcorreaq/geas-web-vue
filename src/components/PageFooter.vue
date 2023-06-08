@@ -1,10 +1,10 @@
 <script lang="ts">
 import SvgIcon from '@jamescoyle/vue-icon';
-import { mdiGithub, mdiSourceBranch } from '@mdi/js';
+import { mdiGithub, mdiMastodon } from '@mdi/js';
 
 interface PageFooterComponentData {
   githubIconSvgPath: string;
-  sourceBranch: string;
+  mastodonIconSvgPath: string;
 }
 
 export default {
@@ -13,7 +13,7 @@ export default {
   },
   data: (): PageFooterComponentData => ({
     githubIconSvgPath: mdiGithub,
-    sourceBranch: mdiSourceBranch,
+    mastodonIconSvgPath: mdiMastodon,
   }),
 };
 </script>
@@ -22,14 +22,13 @@ export default {
   <div class="grid">
     <div>
       Made by
-      <a href="https://github.com/gcorreaq"
-        >gcorreaq <svg-icon type="mdi" :path="githubIconSvgPath"></svg-icon
+      <a href="https://mastodon.social/@gonchimon"
+        >@gonchimon@mastodon.social <svg-icon type="mdi" :path="mastodonIconSvgPath"></svg-icon
       ></a>
-    </div>
-    <div>
-      <a href="https://github.com/gcorreaq/gean-web"
-        >gean-web
-        <svg-icon type="mdi" :path="sourceBranch"></svg-icon>
+      |
+      <a href="https://github.com/gcorreaq/geas-web-vue"
+        >geas-web-vue
+        <svg-icon type="mdi" :path="githubIconSvgPath"></svg-icon>
       </a>
     </div>
   </div>

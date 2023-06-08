@@ -6,8 +6,9 @@ You can switch between the two branches.
 <script lang="ts">
 import AvailableAppointmentsList from './components/AvailableAppointmentsList.vue';
 import IconHelpTooltip from './components/icons/IconHelpTooltip.vue';
-import NotificationCheckbox from './components/NotificationCheckbox.vue';
 import LocationsSelector from './components/LocationsSelector.vue';
+import NotificationCheckbox from './components/NotificationCheckbox.vue';
+import PageFooter from './components/PageFooter.vue';
 import type { ApiAvailableSlots } from './apiTypes';
 
 const API_URL = `https://ttp.cbp.dhs.gov/schedulerapi/slot-availability`;
@@ -26,8 +27,9 @@ export default {
   components: {
     AvailableAppointmentsList,
     IconHelpTooltip,
-    NotificationCheckbox,
     LocationsSelector,
+    NotificationCheckbox,
+    PageFooter,
   },
 
   data: (): AppData => ({
@@ -165,6 +167,7 @@ export default {
       </p>
     </div>
   </div>
+  <PageFooter />
 </template>
 
 <style></style>

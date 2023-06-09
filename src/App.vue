@@ -109,11 +109,7 @@ export default {
 <template>
   <div class="grid">
     <div>
-      <h1>Global Entry Appointment Search</h1>
-    </div>
-  </div>
-  <div id="searchBar" class="grid">
-    <div>
+      <h4>Global Entry Appointment Search</h4>
       <form @submit.prevent>
         <LocationsSelector ref="locationSelectorRef" />
         <button

@@ -24,15 +24,15 @@ export default defineComponent({
 </script>
 
 <template>
-  <input
-    @change="changeNotifications"
-    type="checkbox"
-    v-model="notificationsEnabled"
-    id="shouldSendNotifications"
-    role="switch"
-  />
-  <label for="shouldSendNotifications"
-    >Get notified?
+  <label for="shouldSendNotifications">
+    <input
+      @change="changeNotifications"
+      type="checkbox"
+      v-model="notificationsEnabled"
+      id="shouldSendNotifications"
+      role="switch"
+    />
+    Get notified
     <IconHelpTooltip
       tooltip="Show a notification in your browser when there's new appointments availalbe"
     />

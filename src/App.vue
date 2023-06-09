@@ -120,16 +120,16 @@ export default {
         >
           {{ searchButtonText }}
         </button>
-        <input
-          @change="changeAutoRetry"
-          type="checkbox"
-          v-model="shouldAutoRetry"
-          id="shouldAutoRetry"
-          role="switch"
-        />
         <label for="shouldAutoRetry">
-          Auto retry?
-          <IconHelpTooltip tooltip="Automatically do a new search every 60 seconds" />
+          <input
+            @change="changeAutoRetry"
+            type="checkbox"
+            v-model="shouldAutoRetry"
+            id="shouldAutoRetry"
+            role="switch"
+          />
+          Auto retry
+          <IconHelpTooltip tooltip="Automatically do a new search every ~60 seconds" />
         </label>
         <NotificationCheckbox ref="notificationCheckboxRef" />
       </form>
@@ -140,12 +140,12 @@ export default {
   </div>
   <div class="grid" id="results" v-if="didFirstSearch && !activeSearch">
     <div id="availableResults" v-if="hasAvailableAppointments">
-      <h2>Available appointments</h2>
-      <AvailableAppointmentsList :appointments="appointments" />
-      <p>
+      <hgroup>
+        <h5>Available appointments</h5>
         To schedule an appointment go to
         <a href="https://ttp.cbp.dhs.gov/">https://ttp.cbp.dhs.gov/</a>
-      </p>
+      </hgroup>
+      <AvailableAppointmentsList :appointments="appointments" />
     </div>
     <div id="noResults" v-else>
       <h2>No results found</h2>
@@ -153,14 +153,14 @@ export default {
   </div>
   <div class="grid">
     <div v-if="didFirstSearch">
-      <p>
-        <em>Last searched on {{ lastSearchDate }}</em>
-      </p>
-      <p>
-        <small v-if="shouldAutoRetry && currentTimeoutIntervalId">
-          Auto-retry is activated. Searching again in ~60 seconds...
-        </small>
-      </p>
+      <small
+        ><em>Last searched on {{ lastSearchDate }}</em></small
+      >
+    </div>
+    <div v-if="didFirstSearch">
+      <small v-if="shouldAutoRetry && currentTimeoutIntervalId">
+        Auto-retry is activated. Searching again in ~60 seconds...
+      </small>
     </div>
   </div>
   <PageFooter />

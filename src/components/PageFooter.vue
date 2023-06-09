@@ -21,15 +21,17 @@ export default {
 <template>
   <div class="grid">
     <div>
-      Made by
-      <a href="https://mastodon.social/@gonchimon"
-        >@gonchimon@mastodon.social <svg-icon type="mdi" :path="mastodonIconSvgPath"></svg-icon
-      ></a>
-      |
-      <a href="https://github.com/gcorreaq/geas-web-vue"
-        >geas-web-vue
-        <svg-icon type="mdi" :path="githubIconSvgPath"></svg-icon>
-      </a>
+      <small>
+        Made by
+        <a href="https://mastodon.social/@gonchimon"
+          >@gonchimon@mastodon.social <svg-icon type="mdi" :path="mastodonIconSvgPath"></svg-icon
+        ></a>
+        |
+        <a href="https://github.com/gcorreaq/geas-web-vue"
+          >geas-web-vue
+          <svg-icon type="mdi" :path="githubIconSvgPath"></svg-icon>
+        </a>
+      </small>
     </div>
   </div>
 </template>

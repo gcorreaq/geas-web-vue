@@ -6,6 +6,7 @@ export function createNotification(availableAppointments: Array<ApiAvailableSlot
     return;
   }
   const count = availableAppointments.length;
+  // TODO: I need an icon for this so it looks nice
   new Notification(i18next.t('appointmentNotifications.title', { count }), {
     body: i18next.t('appointmentNotifications.body', { count }),
   });

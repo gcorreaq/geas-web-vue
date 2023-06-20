@@ -1,4 +1,3 @@
-// import './assets/main.css'
 import i18next from 'i18next';
 
 import { createApp } from 'vue';

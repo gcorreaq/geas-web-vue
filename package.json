@@ -13,19 +13,10 @@
     "format:check": "prettier --check .",
     "prepare": "husky install"
   },
-  "lint-staged": {
-    "**/*.{js,ts,vue}": [
-      "npm run lint",
-      "npm run type-check",
-      "npm run format:check"
-    ],
-    "**/*.{json,yaml,yml}": [
-      "npm run format:check"
-    ]
-  },
   "dependencies": {
     "@jamescoyle/vue-icon": "^0.1.2",
     "@mdi/js": "^7.2.96",
+    "i18next": "^23.1.0",
     "vue": "^3.3.2"
   },
   "devDependencies": {

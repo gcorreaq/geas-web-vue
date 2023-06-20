@@ -10,6 +10,7 @@ import LocationsSelector from './components/LocationsSelector.vue';
 import NotificationCheckbox from './components/NotificationCheckbox.vue';
 import PageFooter from './components/PageFooter.vue';
 import type { ApiAvailableSlots } from './apiTypes';
+import { createNotification } from './notificationsBuilder';
 
 const API_URL = `https://ttp.cbp.dhs.gov/schedulerapi/slot-availability`;
 const DEFAULT_DELAY = 60000; // 1 minute
@@ -85,10 +86,9 @@ export default {
     },
     async sendNotification() {
       if (
-        (this.$refs.notificationCheckboxRef as typeof NotificationCheckbox).notificationsEnabled &&
-        Notification.permission === 'granted'
+        (this.$refs.notificationCheckboxRef as typeof NotificationCheckbox).notificationsEnabled
       ) {
-        new Notification('Appointment available!');
+        createNotification(this.appointments);
       }
     },
     async changeAutoRetry() {

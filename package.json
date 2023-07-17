@@ -16,7 +16,7 @@
   "dependencies": {
     "@jamescoyle/vue-icon": "^0.1.2",
     "@mdi/js": "^7.2.96",
-    "i18next": "^23.1.0",
+    "i18next": "^23.2.11",
     "vue": "^3.3.2"
   },
   "devDependencies": {

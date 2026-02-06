@@ -10,6 +10,8 @@
     "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "format": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "format:check": "prettier --check .",
     "prepare": "husky install"
   },
@@ -26,15 +28,18 @@
     "@vitejs/plugin-vue": "^6.0.4",
     "@vue/eslint-config-prettier": "^7.1.0",
     "@vue/eslint-config-typescript": "^11.0.3",
+    "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.4.0",
     "eslint": "^8.42.0",
     "eslint-plugin-vue": "^9.17.0",
     "husky": "^8.0.3",
+    "jsdom": "^28.0.0",
     "lint-staged": "^14.0.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.8.8",
     "typescript": "~5.6.2",
     "vite": "^7.3.1",
+    "vitest": "^4.0.18",
     "vue-tsc": "^2.0.0"
   }
 }

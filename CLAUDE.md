@@ -27,8 +27,8 @@ npm run build          # Type-check and build for production (parallel)
 npm run build-only     # Build without type-checking
 npm run type-check     # Run vue-tsc type checking
 npm run lint           # Run ESLint with --fix
-npm run test           # Run Vitest in watch mode
-npm run test:run       # Run Vitest once (CI-friendly)
+npm run test           # Run Vitest once (CI-friendly)
+npm run test:watch     # Run Vitest in watch mode
 npm run format         # Run Prettier (write mode)
 npm run format:check   # Run Prettier (check mode, used in CI)
 ```
@@ -44,7 +44,7 @@ CI runs on every pull request and push to `main` (`.github/workflows/ci-on-pull-
 Before submitting changes, verify all four pass locally:
 
 ```bash
-npm run lint && npm run type-check && npm run format:check && npm run test:run
+npm run lint && npm run type-check && npm run format:check && npm run test
 ```
 
 ## Pre-commit Hooks

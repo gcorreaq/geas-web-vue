@@ -130,6 +130,14 @@ Using the native `fetch` API. Auto-retry polls every 60 seconds via `setTimeout`
 
 Releases are automated via `release-please` (`.github/workflows/release-please.yaml`). It creates release PRs and tags on pushes to `main`. Configuration is in `release-please-config.json` and `.release-please-manifest.json`.
 
+## Claude Code on the Web
+
+A `SessionStart` hook (`.claude/hooks/session-start.sh`) runs automatically in remote sessions to install:
+- **`gh` CLI** — for GitHub operations (PRs, issues, etc.)
+- **npm dependencies** — so linting and type-checking work immediately
+
+The hook is registered in `.claude/settings.json` and only runs when `$CLAUDE_CODE_REMOTE` is set.
+
 ## Things to Watch Out For
 
 - **No error handling on fetch** — the API call in `App.vue` has no try-catch

@@ -35,11 +35,12 @@ npm run format:check   # Run Prettier (check mode, used in CI)
 
 ## CI Pipeline
 
-CI runs on every pull request and push to `main` (`.github/workflows/ci-on-pull-request.yaml`). It runs three parallel jobs on Ubuntu 22.04 with Node 24:
+CI runs on every pull request and push to `main` (`.github/workflows/ci-on-pull-request.yaml`). It runs four parallel jobs on Ubuntu 22.04 with Node 24:
 
 1. **eslint** — `npm run lint`
 2. **type-check** — `npm run type-check`
 3. **formatting** — `npm run format:check`
+4. **test** — `npm run test`
 
 Before submitting changes, verify all four pass locally:
 

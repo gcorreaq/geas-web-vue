@@ -22,9 +22,9 @@ describe('AvailableAppointmentsList', () => {
 
     expect(wrapper.find('table').exists()).toBe(true);
     expect(wrapper.find('thead').exists()).toBe(true);
-    const headers = wrapper.findAll('th');
-    expect(headers.some((h) => h.text() === '#')).toBe(true);
-    expect(headers.some((h) => h.text() === 'Date and time')).toBe(true);
+    const headers = wrapper.findAll('thead th');
+    expect(headers[0].text()).toBe('Date');
+    expect(headers[1].text()).toBe('Time');
   });
 
   it('renders no appointment rows when appointments is empty', () => {
@@ -47,13 +47,31 @@ describe('AvailableAppointmentsList', () => {
     expect(rows).toHaveLength(2);
   });
 
-  it('passes startTimestamp to child AvailableAppointment components', () => {
+  it('passes parsed dates to child AvailableAppointment components', () => {
     const appointments = [makeSlot('2024-03-20T09:15')];
 
     const wrapper = mount(AvailableAppointmentsList, {
       props: { appointments },
     });
 
-    expect(wrapper.text()).toContain('2024-03-20 09:15');
+    expect(wrapper.text()).toContain('Wednesday, March 20, 2024');
+    expect(wrapper.text()).toContain('09:15');
+  });
+
+  it('shows date only on the first row of each date group', () => {
+    const appointments = [
+      makeSlot('2024-01-15T10:00'),
+      makeSlot('2024-01-15T11:00'),
+      makeSlot('2024-01-16T09:00'),
+    ];
+
+    const wrapper = mount(AvailableAppointmentsList, {
+      props: { appointments },
+    });
+
+    const rows = wrapper.findAll('tbody tr');
+    expect(rows[0].find('th').text()).toBe('Monday, January 15, 2024');
+    expect(rows[1].find('th').text()).toBe('');
+    expect(rows[2].find('th').text()).toBe('Tuesday, January 16, 2024');
   });
 });

@@ -4,36 +4,36 @@ import AvailableAppointment from '../AvailableAppointment.vue';
 
 describe('AvailableAppointment', () => {
   it.each([
-    ['2024-01-15T10:30', '2024-01-15 10:30'],
-    ['2024-01-15T10:30Z', '2024-01-15 10:30'],
-    ['2024-06-20T14:00Z', '2024-06-20 14:00'],
-  ])('formats timestamp "%s" as "%s"', (timestamp, expected) => {
+    [new Date('2024-01-15T10:30'), '10:30'],
+    [new Date('2024-06-20T14:00'), '14:00'],
+    [new Date('2024-03-20T09:15'), '09:15'],
+  ])('formats the time using Intl.DateTimeFormat', (appointmentDate, expectedTime) => {
     const wrapper = mount(AvailableAppointment, {
-      props: { timestamp },
+      props: { appointmentDate, showDate: false },
     });
 
-    expect(wrapper.text()).toContain(expected);
+    expect(wrapper.find('td').text()).toBe(expectedTime);
   });
 
-  it('renders the formatted date replacing T with space', () => {
+  it('formats the date using Intl.DateTimeFormat when showDate is true', () => {
     const wrapper = mount(AvailableAppointment, {
-      props: { timestamp: '2024-01-15T10:30' },
+      props: { appointmentDate: new Date('2024-01-15T10:30'), showDate: true },
     });
 
-    expect(wrapper.text()).not.toContain('T');
+    expect(wrapper.find('th').text()).toBe('Monday, January 15, 2024');
   });
 
-  it('renders the formatted date removing the trailing Z', () => {
+  it('hides the date when showDate is false', () => {
     const wrapper = mount(AvailableAppointment, {
-      props: { timestamp: '2024-01-15T10:30Z' },
+      props: { appointmentDate: new Date('2024-01-15T10:30'), showDate: false },
     });
 
-    expect(wrapper.text()).not.toContain('Z');
+    expect(wrapper.find('th').text()).toBe('');
   });
 
   it('renders inside a table row', () => {
     const wrapper = mount(AvailableAppointment, {
-      props: { timestamp: '2024-01-15T10:30' },
+      props: { appointmentDate: new Date('2024-01-15T10:30'), showDate: true },
     });
 
     expect(wrapper.find('tr').exists()).toBe(true);

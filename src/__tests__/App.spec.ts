@@ -175,7 +175,7 @@ describe('App', () => {
     it('fetches data from the API and updates appointments', async () => {
       const slots = [makeSlot()];
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
-        json: () => Promise.resolve({ availableSlots: slots }),
+        json: () => Promise.resolve(slots),
       });
 
       const wrapper = mountApp();
@@ -185,7 +185,9 @@ describe('App', () => {
       await flushPromises();
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'https://ttp.cbp.dhs.gov/schedulerapi/slot-availability?locationId=5446'
+        expect.stringMatching(
+          /^https:\/\/ttp\.cbp\.dhs\.gov\/schedulerapi\/locations\/5446\/slots\?startTimestamp=.+&endTimestamp=.+$/
+        )
       );
       expect(wrapper.vm.appointments).toEqual(slots);
       expect(wrapper.vm.didFirstSearch).toBe(true);
@@ -195,7 +197,7 @@ describe('App', () => {
 
     it('sets appointments to empty array when API returns no slots', async () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
-        json: () => Promise.resolve({}),
+        json: () => Promise.resolve([]),
       });
 
       const wrapper = mountApp();
@@ -209,7 +211,7 @@ describe('App', () => {
 
     it('schedules auto-retry when shouldAutoRetry is true', async () => {
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
-        json: () => Promise.resolve({ availableSlots: [] }),
+        json: () => Promise.resolve([]),
       });
 
       const wrapper = mountApp();
@@ -226,7 +228,7 @@ describe('App', () => {
       vi.mocked(createNotification).mockClear();
       const slots = [makeSlot()];
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
-        json: () => Promise.resolve({ availableSlots: slots }),
+        json: () => Promise.resolve(slots),
       });
 
       const wrapper = mountApp(true);
@@ -243,7 +245,7 @@ describe('App', () => {
       vi.mocked(createNotification).mockClear();
 
       (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
-        json: () => Promise.resolve({ availableSlots: [makeSlot()] }),
+        json: () => Promise.resolve([makeSlot()]),
       });
 
       const wrapper = mountApp(false);

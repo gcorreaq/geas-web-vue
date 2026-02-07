@@ -70,10 +70,10 @@ export default {
       this.clearFetchDataTimeout();
       const locationId = (this.$refs.locationSelectorRef as typeof LocationsSelector)
         .currentLocationId;
-      const url = `${API_URL}?orderBy=soonest&locationId=${locationId}`;
+      const url = `${API_URL}?orderBy=soonest&limit=1000&locationId=${locationId}&minimum=1`;
       const response = await (await fetch(url)).json();
       this.lastSearched = new Date();
-      this.appointments = Array.isArray(response) ? response : response['availableSlots'] || [];
+      this.appointments = response;
       this.activeSearch = false;
       this.didFirstSearch = true;
       if (this.shouldAutoRetry) {

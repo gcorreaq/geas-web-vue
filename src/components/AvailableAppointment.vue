@@ -1,28 +1,28 @@
 <script lang="ts">
-export default {
-  data() {
-    return {
-      parsedDate: new Date(this.timestamp),
-    };
-  },
+const dateFormat = new Intl.DateTimeFormat('en-US', {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
 
+const timeFormat = new Intl.DateTimeFormat('en-US', {
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+});
+
+export default {
   computed: {
     date(): string {
-      const d = this.parsedDate as Date;
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
+      return dateFormat.format(this.appointmentDate as Date);
     },
     time(): string {
-      const d = this.parsedDate as Date;
-      const hours = String(d.getHours()).padStart(2, '0');
-      const minutes = String(d.getMinutes()).padStart(2, '0');
-      return `${hours}:${minutes}`;
+      return timeFormat.format(this.appointmentDate as Date);
     },
   },
 
-  props: ['timestamp', 'showDate'],
+  props: ['appointmentDate', 'showDate'],
 };
 </script>
 

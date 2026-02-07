@@ -47,14 +47,14 @@ describe('AvailableAppointmentsList', () => {
     expect(rows).toHaveLength(2);
   });
 
-  it('passes startTimestamp to child AvailableAppointment components', () => {
+  it('passes parsed dates to child AvailableAppointment components', () => {
     const appointments = [makeSlot('2024-03-20T09:15')];
 
     const wrapper = mount(AvailableAppointmentsList, {
       props: { appointments },
     });
 
-    expect(wrapper.text()).toContain('2024-03-20');
+    expect(wrapper.text()).toContain('Wednesday, March 20, 2024');
     expect(wrapper.text()).toContain('09:15');
   });
 
@@ -70,8 +70,8 @@ describe('AvailableAppointmentsList', () => {
     });
 
     const rows = wrapper.findAll('tbody tr');
-    expect(rows[0].find('th').text()).toBe('2024-01-15');
+    expect(rows[0].find('th').text()).toBe('Monday, January 15, 2024');
     expect(rows[1].find('th').text()).toBe('');
-    expect(rows[2].find('th').text()).toBe('2024-01-16');
+    expect(rows[2].find('th').text()).toBe('Tuesday, January 16, 2024');
   });
 });

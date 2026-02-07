@@ -4,28 +4,28 @@ import AvailableAppointment from '../AvailableAppointment.vue';
 
 describe('AvailableAppointment', () => {
   it.each([
-    ['2024-01-15T10:30', '10:30'],
-    ['2024-01-15T10:30Z', '10:30'],
-    ['2024-06-20T14:00Z', '14:00'],
-  ])('extracts time from timestamp "%s" as "%s"', (timestamp, expectedTime) => {
+    [new Date('2024-01-15T10:30'), '10:30'],
+    [new Date('2024-06-20T14:00'), '14:00'],
+    [new Date('2024-03-20T09:15'), '09:15'],
+  ])('formats the time using Intl.DateTimeFormat', (appointmentDate, expectedTime) => {
     const wrapper = mount(AvailableAppointment, {
-      props: { timestamp, showDate: false },
+      props: { appointmentDate, showDate: false },
     });
 
     expect(wrapper.find('td').text()).toBe(expectedTime);
   });
 
-  it('shows the date when showDate is true', () => {
+  it('formats the date using Intl.DateTimeFormat when showDate is true', () => {
     const wrapper = mount(AvailableAppointment, {
-      props: { timestamp: '2024-01-15T10:30', showDate: true },
+      props: { appointmentDate: new Date('2024-01-15T10:30'), showDate: true },
     });
 
-    expect(wrapper.find('th').text()).toBe('2024-01-15');
+    expect(wrapper.find('th').text()).toBe('Monday, January 15, 2024');
   });
 
   it('hides the date when showDate is false', () => {
     const wrapper = mount(AvailableAppointment, {
-      props: { timestamp: '2024-01-15T10:30', showDate: false },
+      props: { appointmentDate: new Date('2024-01-15T10:30'), showDate: false },
     });
 
     expect(wrapper.find('th').text()).toBe('');
@@ -33,7 +33,7 @@ describe('AvailableAppointment', () => {
 
   it('renders inside a table row', () => {
     const wrapper = mount(AvailableAppointment, {
-      props: { timestamp: '2024-01-15T10:30', showDate: true },
+      props: { appointmentDate: new Date('2024-01-15T10:30'), showDate: true },
     });
 
     expect(wrapper.find('tr').exists()).toBe(true);

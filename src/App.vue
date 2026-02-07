@@ -12,7 +12,7 @@ import PageFooter from './components/PageFooter.vue';
 import type { ApiAvailableSlots } from './apiTypes';
 import { createNotification } from './notificationsBuilder';
 
-const API_URL = `https://ttp.cbp.dhs.gov/schedulerapi/locations`;
+const API_URL = `https://ttp.cbp.dhs.gov/schedulerapi/slots`;
 const DEFAULT_DELAY = 60000; // 1 minute
 
 interface AppData {
@@ -70,11 +70,7 @@ export default {
       this.clearFetchDataTimeout();
       const locationId = (this.$refs.locationSelectorRef as typeof LocationsSelector)
         .currentLocationId;
-      const startTimestamp = new Date().toISOString().slice(0, 19);
-      const endDate = new Date();
-      endDate.setFullYear(endDate.getFullYear() + 1);
-      const endTimestamp = endDate.toISOString().slice(0, 19);
-      const url = `${API_URL}/${locationId}/slots?startTimestamp=${startTimestamp}&endTimestamp=${endTimestamp}`;
+      const url = `${API_URL}?orderBy=soonest&locationId=${locationId}`;
       const response = await (await fetch(url)).json();
       this.lastSearched = new Date();
       this.appointments = Array.isArray(response) ? response : response['availableSlots'] || [];

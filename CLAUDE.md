@@ -10,12 +10,11 @@ There is no backend server — the app runs entirely in the browser and calls th
 
 ## Tech Stack
 
-- **Framework:** Vue 3.3 (Options API, not Composition API)
+- **Framework:** Vue 3.3 (Composition API with `<script setup>`)
 - **Language:** TypeScript 5.6
 - **Build Tool:** Vite 7.3
-- **CSS:** Pico CSS v1 (loaded from CDN in `index.html`, no custom CSS files)
-- **Icons:** Material Design Icons via `@mdi/js` + `@jamescoyle/vue-icon`
-- **i18n:** i18next (English only, configured inline in `src/main.ts`)
+- **CSS:** Custom CSS (`src/assets/main.css`, no external CSS framework)
+- **Icons:** Inline SVG paths (no icon library dependency)
 - **Testing:** Vitest 4 + Vue Test Utils + jsdom
 - **Node version:** 24
 
@@ -79,18 +78,20 @@ Unit tests use **Vitest** with **Vue Test Utils** and **jsdom** as the DOM envir
 
 ```
 src/
-├── main.ts                    # App entry: i18next init + Vue mount
-├── App.vue                    # Root component: all app state and API logic
-├── apiTypes.ts                # TypeScript types for CBP API responses
+├── main.ts                    # App entry: Vue mount + CSS import
+├── App.vue                    # Root component: template + composable wiring
+├── apiTypes.ts                # TypeScript interfaces for CBP API responses
 ├── notificationsBuilder.ts    # Browser Notification API wrapper
-├── vue-icon.d.ts              # Type declarations for @jamescoyle/vue-icon
 ├── assets/
-│   └── locations.json         # Static list of CBP enrollment centers (~208KB)
+│   ├── locations.json         # Static list of CBP enrollment centers (~208KB)
+│   └── main.css               # Custom CSS (layout, forms, toggles, tooltips)
+├── composables/
+│   └── useAppointmentSearch.ts  # API polling, auto-retry, and search state
 └── components/
-    ├── AvailableAppointmentsList.vue   # Table of available slots
-    ├── AvailableAppointment.vue        # Single appointment row
-    ├── LocationsSelector.vue           # Enrollment center dropdown
-    ├── NotificationCheckbox.vue        # Browser notification toggle
+    ├── AvailableAppointmentsList.vue   # Grouped list of available slots
+    ├── AvailableAppointment.vue        # Single date group accordion
+    ├── LocationsSelector.vue           # Enrollment center dropdown (v-model)
+    ├── NotificationCheckbox.vue        # Browser notification toggle (v-model)
     ├── PageFooter.vue                  # Footer with GitHub link
     └── icons/
         └── IconHelpTooltip.vue         # Help icon with tooltip
@@ -100,27 +101,27 @@ src/
 
 ### State Management
 
-No external state library (no Pinia/Vuex). All application state lives in `App.vue` as an `AppData` interface using Vue's Options API `data()`. Child components are accessed via template refs (`this.$refs`).
+No external state library (no Pinia/Vuex). All application state lives in the `useAppointmentSearch` composable (`src/composables/useAppointmentSearch.ts`), which `App.vue` consumes via Composition API.
 
 ### API Integration
 
 The app calls a single endpoint:
 
 ```
-https://ttp.cbp.dhs.gov/schedulerapi/slot-availability?locationId={id}
+https://ttp.cbp.dhs.gov/schedulerapi/slots?orderBy=soonest&limit=1000&locationId={id}&minimum=1
 ```
 
-Using the native `fetch` API. Auto-retry polls every 60 seconds via `setTimeout`.
+Using the native `fetch` API with `AbortController` for cancellation. Auto-retry polls every 60 seconds via `setTimeout`. Errors are caught and surfaced in the UI via `fetchError` state. Timers and in-flight requests are cleaned up on component unmount via `onUnmounted`.
 
 ### Component Communication
 
 - Props down (`:appointments` to list component)
-- Refs up (`this.$refs.locationSelectorRef`, `this.$refs.notificationCheckboxRef`)
-- No custom events emitted between components
+- `v-model` for two-way binding (`LocationsSelector`, `NotificationCheckbox`)
+- No `$refs` — all component communication uses props and events
 
 ### Notifications
 
-`notificationsBuilder.ts` wraps the browser Notification API. Notifications use i18next for pluralized messages and are tagged for deduplication.
+`notificationsBuilder.ts` wraps the browser Notification API. Notifications use simple string interpolation and are tagged for deduplication.
 
 ## Code Conventions
 
@@ -140,9 +141,10 @@ Using the native `fetch` API. Auto-retry polls every 60 seconds via `setTimeout`
 
 ### Vue Style
 
-- Options API with TypeScript (`<script lang="ts">`)
-- Components have `<style></style>` tags (currently empty — styling is from Pico CSS)
-- Template refs for cross-component data access
+- Composition API with `<script setup lang="ts">`
+- All styling in `src/assets/main.css` (components have no `<style>` blocks)
+- `v-model` for parent-child two-way binding
+- Composables (`src/composables/`) for reusable stateful logic
 
 ### Path Alias
 
@@ -150,14 +152,16 @@ Using the native `fetch` API. Auto-retry polls every 60 seconds via `setTimeout`
 
 ## Key Files to Know
 
-| File                                   | Purpose                                              |
-| -------------------------------------- | ---------------------------------------------------- |
-| `src/App.vue`                          | All application state, API polling, auto-retry logic |
-| `src/apiTypes.ts`                      | TypeScript definitions matching CBP API responses    |
-| `src/notificationsBuilder.ts`          | Browser notification creation                        |
-| `src/main.ts`                          | i18next configuration and Vue app bootstrap          |
-| `src/assets/locations.json`            | Static CBP enrollment center data                    |
-| `src/components/LocationsSelector.vue` | Location dropdown (default: San Francisco, ID 5446)  |
+| File                                      | Purpose                                             |
+| ----------------------------------------- | --------------------------------------------------- |
+| `src/App.vue`                             | Root component: template + composable wiring        |
+| `src/composables/useAppointmentSearch.ts` | API polling, auto-retry, search state, cleanup      |
+| `src/apiTypes.ts`                         | TypeScript interfaces for CBP API responses         |
+| `src/notificationsBuilder.ts`             | Browser notification creation                       |
+| `src/main.ts`                             | Vue app bootstrap + CSS import                      |
+| `src/assets/main.css`                     | All application styles                              |
+| `src/assets/locations.json`               | Static CBP enrollment center data                   |
+| `src/components/LocationsSelector.vue`    | Location dropdown (default: San Francisco, ID 5446) |
 
 ## Release Process
 
@@ -165,8 +169,8 @@ Releases are automated via `release-please` (`.github/workflows/release-please.y
 
 ## Things to Watch Out For
 
-- **No error handling on fetch** — the API call in `App.vue` has no try-catch
 - **No routing** — this is a single-view app, no Vue Router
 - **Tests use explicit imports** — import `describe`, `it`, `expect` from `vitest` (globals mode is not enabled)
 - **Large static asset** — `locations.json` is ~208KB of embedded CBP location data
-- **CDN dependency** — Pico CSS is loaded from a CDN in `index.html`, not bundled
+- **No external CSS framework** — all styles are custom in `src/assets/main.css`
+- **Only dependency is `vue`** — no icon libraries, i18n, or CSS frameworks at runtime

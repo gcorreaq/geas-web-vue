@@ -59,25 +59,18 @@ describe('notificationsBuilder', () => {
     });
   });
 
-  it('does not create a notification when permission is not granted', () => {
-    Object.defineProperty(Notification, 'permission', {
-      value: 'denied',
-      configurable: true,
-    });
+  it.each(['denied', 'default'] as const)(
+    'does not create a notification when permission is "%s"',
+    (permission) => {
+      Object.defineProperty(Notification, 'permission', {
+        value: permission,
+        configurable: true,
+      });
 
-    createNotification([makeSlot()]);
-    expect(NotificationSpy).not.toHaveBeenCalled();
-  });
-
-  it('does not create a notification when permission is default', () => {
-    Object.defineProperty(Notification, 'permission', {
-      value: 'default',
-      configurable: true,
-    });
-
-    createNotification([makeSlot()]);
-    expect(NotificationSpy).not.toHaveBeenCalled();
-  });
+      createNotification([makeSlot()]);
+      expect(NotificationSpy).not.toHaveBeenCalled();
+    }
+  );
 
   it('passes correct count for multiple appointments', () => {
     const slots = [makeSlot(), makeSlot({ startTimestamp: '2024-01-16T11:00' })];

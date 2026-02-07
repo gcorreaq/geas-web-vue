@@ -43,13 +43,11 @@ describe('LocationsSelector', () => {
   it('updates currentLocationId when a different option is selected', async () => {
     const wrapper = mount(LocationsSelector);
     const select = wrapper.find('select');
-    const options = wrapper.findAll('option');
+    const firstOption = wrapper.find('option');
 
-    // Pick an option that is not the default
-    const nonDefaultOption = options.find((o) => o.element.value !== '5446');
-    if (nonDefaultOption) {
-      await select.setValue(nonDefaultOption.element.value);
-      expect(wrapper.vm.currentLocationId).not.toBe(5446);
-    }
+    // The first option in the sorted list is never 5446 (San Francisco),
+    // so selecting it will change currentLocationId
+    await select.setValue(firstOption.element.value);
+    expect(wrapper.vm.currentLocationId).not.toBe(5446);
   });
 });

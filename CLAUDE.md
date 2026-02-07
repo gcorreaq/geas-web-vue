@@ -64,6 +64,7 @@ Unit tests use **Vitest** with **Vue Test Utils** and **jsdom** as the DOM envir
 - **File naming:** `*.spec.ts` for test files
 - **Imports:** use explicit imports from `vitest` (`import { describe, it, expect } from 'vitest'`)
 - **Component mounting:** use `mount` or `shallowMount` from `@vue/test-utils`
+- **Assertions must be deterministic:** never place `expect()` calls inside conditional blocks (`if`/`else`). Tests with conditional assertions can silently pass without checking anything. Restructure the test so every assertion always executes.
 - **TypeScript config:** `tsconfig.vitest.json` extends `tsconfig.app.json` and includes test files (the app tsconfig excludes `__tests__`)
 
 ## Source Code Structure

@@ -3,20 +3,28 @@ import { mount } from '@vue/test-utils';
 import AvailableAppointment from '../AvailableAppointment.vue';
 
 describe('AvailableAppointment', () => {
-  it('renders the formatted date replacing T with space', () => {
-    const wrapper = mount(AvailableAppointment, {
-      props: { timestamp: '2024-01-15T10:30' },
-    });
-
-    expect(wrapper.text()).toContain('2024-01-15 10:30');
-  });
-
-  it('renders the formatted date replacing Z with space', () => {
+  it('renders the formatted date', () => {
     const wrapper = mount(AvailableAppointment, {
       props: { timestamp: '2024-01-15T10:30Z' },
     });
 
     expect(wrapper.text()).toContain('2024-01-15 10:30');
+  });
+
+  it('renders the formatted date replacing T with space', () => {
+    const wrapper = mount(AvailableAppointment, {
+      props: { timestamp: '2024-01-15T10:30' },
+    });
+
+		expect(wrapper.text()).not.toContain('T');
+  });
+
+  it('renders the formatted date removing the trailing Z', () => {
+    const wrapper = mount(AvailableAppointment, {
+      props: { timestamp: '2024-01-15T10:30Z' },
+    });
+
+		expect(wrapper.text()).not.toContain('Z');
   });
 
   it('renders inside a table row', () => {

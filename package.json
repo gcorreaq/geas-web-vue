@@ -16,9 +16,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@jamescoyle/vue-icon": "^0.1.2",
     "@mdi/js": "^7.2.96",
-    "i18next": "^23.5.1",
     "vue": "^3.3.2"
   },
   "devDependencies": {

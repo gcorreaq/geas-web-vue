@@ -1,18 +1,21 @@
 <script lang="ts">
 export default {
   computed: {
-    formatDate() {
-      return this.timestamp.replace(/T|Z/g, ' ');
+    date(): string {
+      return this.timestamp.substring(0, 10);
+    },
+    time(): string {
+      return this.timestamp.substring(11, 16);
     },
   },
 
-  props: ['timestamp'],
+  props: ['timestamp', 'showDate'],
 };
 </script>
 
 <template>
   <tr>
-    <th scope="row">1</th>
-    <td>{{ formatDate }}</td>
+    <th scope="row">{{ showDate ? date : '' }}</th>
+    <td>{{ time }}</td>
   </tr>
 </template>

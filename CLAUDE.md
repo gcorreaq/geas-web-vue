@@ -19,6 +19,14 @@ There is no backend server — the app runs entirely in the browser and calls th
 - **Testing:** Vitest 4 + Vue Test Utils + jsdom
 - **Node version:** 24
 
+## Environment Setup
+
+Before doing any work, always install dependencies first:
+
+```bash
+npm install
+```
+
 ## Common Commands
 
 ```bash

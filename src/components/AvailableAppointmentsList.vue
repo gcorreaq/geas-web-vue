@@ -14,15 +14,20 @@ export default {
   <table role="grid">
     <thead>
       <tr>
-        <th scope="col">#</th>
-        <th scope="col">Date and time</th>
+        <th scope="col">Date</th>
+        <th scope="col">Time</th>
       </tr>
     </thead>
     <tbody>
       <AvailableAppointment
-        v-for="{ startTimestamp } in appointments"
+        v-for="({ startTimestamp }, index) in appointments"
         :key="startTimestamp"
         :timestamp="startTimestamp"
+        :show-date="
+          index === 0 ||
+          startTimestamp.substring(0, 10) !==
+            appointments[index - 1].startTimestamp.substring(0, 10)
+        "
       />
     </tbody>
   </table>

@@ -3,6 +3,13 @@ import { mount } from '@vue/test-utils';
 import AvailableAppointmentsList from '../AvailableAppointmentsList.vue';
 import type { ApiAvailableSlots } from '../../apiTypes';
 
+const dateFormat = new Intl.DateTimeFormat(undefined, {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
 function makeSlot(startTimestamp: string): ApiAvailableSlots {
   return {
     locationId: 5446,
@@ -15,52 +22,17 @@ function makeSlot(startTimestamp: string): ApiAvailableSlots {
 }
 
 describe('AvailableAppointmentsList', () => {
-  it('renders a table with header columns', () => {
+  it('renders no details elements when appointments is empty', () => {
     const wrapper = mount(AvailableAppointmentsList, {
       props: { appointments: [] },
     });
 
-    expect(wrapper.find('table').exists()).toBe(true);
-    expect(wrapper.find('thead').exists()).toBe(true);
-    const headers = wrapper.findAll('thead th');
-    expect(headers[0].text()).toBe('Date');
-    expect(headers[1].text()).toBe('Time');
+    expect(wrapper.findAll('details')).toHaveLength(0);
   });
 
-  it('renders no appointment rows when appointments is empty', () => {
-    const wrapper = mount(AvailableAppointmentsList, {
-      props: { appointments: [] },
-    });
-
-    expect(wrapper.find('tbody').exists()).toBe(true);
-    expect(wrapper.findAll('tbody tr')).toHaveLength(0);
-  });
-
-  it('renders one row per appointment', () => {
-    const appointments = [makeSlot('2024-01-15T10:30'), makeSlot('2024-01-16T11:00')];
-
-    const wrapper = mount(AvailableAppointmentsList, {
-      props: { appointments },
-    });
-
-    const rows = wrapper.findAll('tbody tr');
-    expect(rows).toHaveLength(2);
-  });
-
-  it('passes parsed dates to child AvailableAppointment components', () => {
-    const appointments = [makeSlot('2024-03-20T09:15')];
-
-    const wrapper = mount(AvailableAppointmentsList, {
-      props: { appointments },
-    });
-
-    expect(wrapper.text()).toContain('Wednesday, March 20, 2024');
-    expect(wrapper.text()).toContain('09:15');
-  });
-
-  it('shows date only on the first row of each date group', () => {
+  it('renders one details element per date group', () => {
     const appointments = [
-      makeSlot('2024-01-15T10:00'),
+      makeSlot('2024-01-15T10:30'),
       makeSlot('2024-01-15T11:00'),
       makeSlot('2024-01-16T09:00'),
     ];
@@ -69,9 +41,40 @@ describe('AvailableAppointmentsList', () => {
       props: { appointments },
     });
 
-    const rows = wrapper.findAll('tbody tr');
-    expect(rows[0].find('th').text()).toBe('Monday, January 15, 2024');
-    expect(rows[1].find('th').text()).toBe('');
-    expect(rows[2].find('th').text()).toBe('Tuesday, January 16, 2024');
+    // Two date groups: Jan 15 (2 times) and Jan 16 (1 time)
+    // Each group renders one top-level details, no nested details (<=3 times)
+    expect(wrapper.findAll('details')).toHaveLength(2);
+  });
+
+  it('groups appointments from the same date together', () => {
+    const appointments = [
+      makeSlot('2024-01-15T10:00'),
+      makeSlot('2024-01-15T11:00'),
+      makeSlot('2024-01-15T12:00'),
+      makeSlot('2024-01-16T09:00'),
+    ];
+
+    const wrapper = mount(AvailableAppointmentsList, {
+      props: { appointments },
+    });
+
+    const expectedJan15 = dateFormat.format(new Date('2024-01-15T10:00'));
+    const expectedJan16 = dateFormat.format(new Date('2024-01-16T09:00'));
+    expect(wrapper.text()).toContain(expectedJan15);
+    expect(wrapper.text()).toContain(expectedJan16);
+
+    // Jan 15 has 3 times, Jan 16 has 1 time — no nested details
+    expect(wrapper.findAll('details')).toHaveLength(2);
+  });
+
+  it('passes parsed dates to child components', () => {
+    const appointments = [makeSlot('2024-03-20T09:15')];
+
+    const wrapper = mount(AvailableAppointmentsList, {
+      props: { appointments },
+    });
+
+    const expectedDate = dateFormat.format(new Date('2024-03-20T09:15'));
+    expect(wrapper.text()).toContain(expectedDate);
   });
 });

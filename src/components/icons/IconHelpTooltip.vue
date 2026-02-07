@@ -1,22 +1,13 @@
-<script lang="ts">
-import SvgIcon from '@jamescoyle/vue-icon';
+<script setup lang="ts">
 import { mdiHelpCircleOutline } from '@mdi/js';
 
-export default {
-  components: {
-    SvgIcon,
-  },
-  data() {
-    return {
-      path: mdiHelpCircleOutline,
-    };
-  },
-  props: ['tooltip'],
-};
+defineProps<{ tooltip: string }>();
 </script>
 
 <template>
-  <a href="#" :data-tooltip="tooltip">
-    <svg-icon type="mdi" :path="path"></svg-icon>
-  </a>
+  <span class="tooltip" :data-tooltip="tooltip">
+    <svg viewBox="0 0 24 24" width="18" height="18">
+      <path :d="mdiHelpCircleOutline" fill="currentColor" />
+    </svg>
+  </span>
 </template>

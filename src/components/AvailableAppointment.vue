@@ -1,4 +1,8 @@
-<script lang="ts">
+<script setup lang="ts">
+import { computed } from 'vue';
+
+const MAX_VISIBLE_TIMES = 3;
+
 const dateFormat = new Intl.DateTimeFormat(undefined, {
   weekday: 'long',
   year: 'numeric',
@@ -11,36 +15,18 @@ const timeFormat = new Intl.DateTimeFormat(undefined, {
   minute: '2-digit',
 });
 
-const MAX_VISIBLE_TIMES = 3;
+const props = defineProps<{ appointments: Date[] }>();
 
-export default {
-  computed: {
-    date(): string {
-      return dateFormat.format((this.appointments as Date[])[0]);
-    },
-    firstTime(): string {
-      return timeFormat.format((this.appointments as Date[])[0]);
-    },
-    visibleTimes(): string[] {
-      return (this.appointments as Date[])
-        .slice(0, MAX_VISIBLE_TIMES)
-        .map((d) => timeFormat.format(d));
-    },
-    hiddenTimes(): string[] {
-      return (this.appointments as Date[])
-        .slice(MAX_VISIBLE_TIMES)
-        .map((d) => timeFormat.format(d));
-    },
-    hasMoreTimes(): boolean {
-      return (this.appointments as Date[]).length > MAX_VISIBLE_TIMES;
-    },
-    moreCount(): number {
-      return (this.appointments as Date[]).length - MAX_VISIBLE_TIMES;
-    },
-  },
-
-  props: ['appointments'],
-};
+const date = computed(() => dateFormat.format(props.appointments[0]));
+const firstTime = computed(() => timeFormat.format(props.appointments[0]));
+const visibleTimes = computed(() =>
+  props.appointments.slice(0, MAX_VISIBLE_TIMES).map((d) => timeFormat.format(d))
+);
+const hiddenTimes = computed(() =>
+  props.appointments.slice(MAX_VISIBLE_TIMES).map((d) => timeFormat.format(d))
+);
+const hasMoreTimes = computed(() => props.appointments.length > MAX_VISIBLE_TIMES);
+const moreCount = computed(() => props.appointments.length - MAX_VISIBLE_TIMES);
 </script>
 
 <template>

@@ -1,40 +1,24 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import IconHelpTooltip from './icons/IconHelpTooltip.vue';
 
-export default defineComponent({
-  components: {
-    IconHelpTooltip,
-  },
+defineProps<{ modelValue: boolean }>();
+const emit = defineEmits<{ 'update:modelValue': [value: boolean] }>();
 
-  data() {
-    return {
-      notificationsEnabled: false,
-    };
-  },
-
-  methods: {
-    async changeNotifications() {
-      if (this.notificationsEnabled && Notification.permission !== 'denied') {
-        await Notification.requestPermission();
-      }
-    },
-  },
-});
+async function changeNotifications(event: Event) {
+  const checked = (event.target as HTMLInputElement).checked;
+  emit('update:modelValue', checked);
+  if (checked && Notification.permission !== 'denied') {
+    await Notification.requestPermission();
+  }
+}
 </script>
 
 <template>
-  <label for="shouldSendNotifications">
-    <input
-      @change="changeNotifications"
-      type="checkbox"
-      v-model="notificationsEnabled"
-      id="shouldSendNotifications"
-      role="switch"
-    />
+  <label class="toggle">
+    <input @change="changeNotifications" type="checkbox" :checked="modelValue" />
     Get notified
     <IconHelpTooltip
-      tooltip="Show a notification in your browser when there's new appointments availalbe"
+      tooltip="Show a notification in your browser when there are new appointments available"
     />
   </label>
 </template>

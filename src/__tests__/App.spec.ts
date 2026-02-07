@@ -185,9 +185,7 @@ describe('App', () => {
       await flushPromises();
 
       expect(global.fetch).toHaveBeenCalledWith(
-        expect.stringMatching(
-          /^https:\/\/ttp\.cbp\.dhs\.gov\/schedulerapi\/locations\/5446\/slots\?startTimestamp=.+&endTimestamp=.+$/
-        )
+        'https://ttp.cbp.dhs.gov/schedulerapi/slots?orderBy=soonest&limit=1000&locationId=5446&minimum=1'
       );
       expect(wrapper.vm.appointments).toEqual(slots);
       expect(wrapper.vm.didFirstSearch).toBe(true);

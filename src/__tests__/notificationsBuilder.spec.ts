@@ -63,19 +63,14 @@ describe('createNotification', () => {
     });
   });
 
-  it('does not create a notification when permission is not granted', () => {
-    vi.stubGlobal('Notification', Object.assign(NotificationMock, { permission: 'denied' }));
+  it.each(['denied', 'default'] as const)(
+    'does not create a notification when permission is "%s"',
+    (permission) => {
+      vi.stubGlobal('Notification', Object.assign(NotificationMock, { permission }));
 
-    createNotification([makeSlot()]);
+      createNotification([makeSlot()]);
 
-    expect(NotificationMock).not.toHaveBeenCalled();
-  });
-
-  it('does not create a notification when permission is default (not yet asked)', () => {
-    vi.stubGlobal('Notification', Object.assign(NotificationMock, { permission: 'default' }));
-
-    createNotification([makeSlot()]);
-
-    expect(NotificationMock).not.toHaveBeenCalled();
-  });
+      expect(NotificationMock).not.toHaveBeenCalled();
+    }
+  );
 });

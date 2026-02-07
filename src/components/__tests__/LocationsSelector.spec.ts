@@ -36,14 +36,13 @@ describe('LocationsSelector', () => {
     const select = wrapper.find('select');
     const options = wrapper.findAll('option');
 
-    // Pick a different option (the second one if available)
-    if (options.length > 1) {
-      const newValue = options[1].attributes('value')!;
-      await select.setValue(newValue);
-      expect((wrapper.vm as unknown as { currentLocationId: number }).currentLocationId).toBe(
-        Number(newValue)
-      );
-    }
+    expect(options.length).toBeGreaterThan(1);
+
+    const newValue = options[1].attributes('value')!;
+    await select.setValue(newValue);
+    expect((wrapper.vm as unknown as { currentLocationId: number }).currentLocationId).toBe(
+      Number(newValue)
+    );
   });
 
   it('renders a label for the select', () => {

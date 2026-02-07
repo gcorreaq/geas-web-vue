@@ -3,20 +3,15 @@ import { mount } from '@vue/test-utils';
 import AvailableAppointment from '@/components/AvailableAppointment.vue';
 
 describe('AvailableAppointment', () => {
-  it('renders formatted date replacing T with space', () => {
+  it.each([
+    { timestamp: '2024-01-15T10:30', expected: '2024-01-15 10:30' },
+    { timestamp: '2024-01-15T10:30Z', expected: '2024-01-15 10:30' },
+  ])('formats "$timestamp" as "$expected"', ({ timestamp, expected }) => {
     const wrapper = mount(AvailableAppointment, {
-      props: { timestamp: '2024-01-15T10:30' },
+      props: { timestamp },
     });
 
-    expect(wrapper.find('td').text()).toBe('2024-01-15 10:30');
-  });
-
-  it('renders formatted date replacing both T and Z with spaces', () => {
-    const wrapper = mount(AvailableAppointment, {
-      props: { timestamp: '2024-01-15T10:30Z' },
-    });
-
-    expect(wrapper.find('td').text()).toBe('2024-01-15 10:30');
+    expect(wrapper.find('td').text()).toBe(expected);
   });
 
   it('renders inside a table row', () => {

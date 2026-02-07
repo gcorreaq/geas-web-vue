@@ -1,27 +1,22 @@
-<script lang="ts">
-import LocationsData from '../assets/locations.json';
+<script setup lang="ts">
+import locationsData from '../assets/locations.json';
 
-const DEFAULT_LOCATION_ID = 5446; // San Francisco Enrollment Center
+const sortedLocations = [...locationsData].sort((a, b) => a.name.localeCompare(b.name));
 
-export default {
-  data() {
-    return {
-      locations: LocationsData.sort((a, b) => (a.name > b.name ? 1 : -1)),
-      currentLocationId: DEFAULT_LOCATION_ID,
-    };
-  },
-};
+defineProps<{ modelValue: number }>();
+const emit = defineEmits<{ 'update:modelValue': [value: number] }>();
+
+function onSelect(event: Event) {
+  emit('update:modelValue', Number((event.target as HTMLSelectElement).value));
+}
+
+defineExpose({ sortedLocations });
 </script>
 
 <template>
   <label for="location">Location</label>
-  <select v-model="currentLocationId" id="location" class="is-left">
-    <option
-      v-for="{ id, name, shortName } in locations"
-      :key="id"
-      :value="id"
-      :selected="id === currentLocationId"
-    >
+  <select :value="modelValue" @change="onSelect" id="location">
+    <option v-for="{ id, name, shortName } in sortedLocations" :key="id" :value="id">
       {{ shortName ? shortName : name }} ({{ id }})
     </option>
   </select>

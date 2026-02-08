@@ -11,10 +11,10 @@ import NotificationCheckbox from './components/NotificationCheckbox.vue';
 import PageFooter from './components/PageFooter.vue';
 import type { ApiAvailableSlots } from './apiTypes';
 import { createNotification } from './notificationsBuilder';
+import { abortableFetch } from './abortableFetch';
 
 const API_URL = `https://ttp.cbp.dhs.gov/schedulerapi/slots`;
 const DEFAULT_DELAY = 60000; // 1 minute
-const FETCH_TIMEOUT = 15000; // 15 seconds
 
 interface AppData {
   appointments: Array<ApiAvailableSlots>;
@@ -23,7 +23,6 @@ interface AppData {
   currentTimeoutIntervalId: number | null;
   didFirstSearch: boolean;
   activeSearch: boolean;
-  abortController: AbortController | null;
 }
 
 export default {
@@ -42,7 +41,6 @@ export default {
     currentTimeoutIntervalId: null,
     didFirstSearch: false,
     activeSearch: false,
-    abortController: null,
   }),
 
   computed: {
@@ -69,33 +67,20 @@ export default {
       }
     },
     async fetchData() {
-      if (this.abortController) {
-        this.abortController.abort();
-      }
-      this.abortController = new AbortController();
-
       this.activeSearch = true;
       this.clearFetchDataTimeout();
       const locationId = (this.$refs.locationSelectorRef as typeof LocationsSelector)
         .currentLocationId;
       const url = `${API_URL}?orderBy=soonest&limit=1000&locationId=${locationId}&minimum=1`;
 
-      const signal = AbortSignal.any([
-        this.abortController.signal,
-        AbortSignal.timeout(FETCH_TIMEOUT),
-      ]);
+      const result = await abortableFetch<ApiAvailableSlots[]>(url);
 
-      try {
-        const response = await fetch(url, { signal });
-        const data = await response.json();
+      if (!result.ok) {
+        if (result.aborted) return;
+      } else {
         this.lastSearched = new Date();
-        this.appointments = data;
+        this.appointments = result.data;
         this.didFirstSearch = true;
-      } catch (e) {
-        if (e instanceof DOMException && e.name === 'AbortError') {
-          return;
-        }
-        console.error('Fetch failed:', e);
       }
 
       this.activeSearch = false;

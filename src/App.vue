@@ -14,6 +14,7 @@ import { createNotification } from './notificationsBuilder';
 
 const API_URL = `https://ttp.cbp.dhs.gov/schedulerapi/slots`;
 const DEFAULT_DELAY = 60000; // 1 minute
+const FETCH_TIMEOUT = 15000; // 15 seconds
 
 interface AppData {
   appointments: Array<ApiAvailableSlots>;
@@ -79,8 +80,13 @@ export default {
         .currentLocationId;
       const url = `${API_URL}?orderBy=soonest&limit=1000&locationId=${locationId}&minimum=1`;
 
+      const signal = AbortSignal.any([
+        this.abortController.signal,
+        AbortSignal.timeout(FETCH_TIMEOUT),
+      ]);
+
       try {
-        const response = await fetch(url, { signal: this.abortController.signal });
+        const response = await fetch(url, { signal });
         const data = await response.json();
         this.lastSearched = new Date();
         this.appointments = data;

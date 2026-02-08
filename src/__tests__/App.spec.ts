@@ -345,6 +345,22 @@ describe('App', () => {
       expect(fetchCall[1]).toHaveProperty('signal');
       expect(fetchCall[1].signal).toBeInstanceOf(AbortSignal);
     });
+
+    it('resets activeSearch to false when fetch times out', async () => {
+      const timeoutError = new DOMException('Signal timed out.', 'TimeoutError');
+      (global.fetch as ReturnType<typeof vi.fn>).mockRejectedValue(timeoutError);
+
+      const wrapper = mountApp();
+      wrapper.vm.shouldAutoRetry = false;
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      await wrapper.vm.fetchData();
+      await flushPromises();
+
+      expect(wrapper.vm.activeSearch).toBe(false);
+      expect(wrapper.vm.appointments).toEqual([]);
+      expect(consoleSpy).toHaveBeenCalledWith('Fetch failed:', timeoutError);
+    });
   });
 
   describe('template rendering', () => {

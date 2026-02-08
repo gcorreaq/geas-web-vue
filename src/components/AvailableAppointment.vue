@@ -36,7 +36,7 @@ const moreCount = computed(() => props.appointments.length - MAX_VISIBLE_TIMES);
 </script>
 
 <template>
-  <details>
+  <details :aria-label="`Appointments for ${date}`">
     <summary>
       {{ date }} — {{ appointmentCount }} {{ appointmentLabel }}, earliest at {{ firstTime }}
     </summary>

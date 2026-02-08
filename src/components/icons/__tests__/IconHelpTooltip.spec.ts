@@ -3,22 +3,23 @@ import { shallowMount } from '@vue/test-utils';
 import IconHelpTooltip from '../IconHelpTooltip.vue';
 
 describe('IconHelpTooltip', () => {
-  it('renders a link with the tooltip text in data-tooltip attribute', () => {
+  it('renders a button with the tooltip text in data-tooltip attribute', () => {
     const tooltipText = 'This is helpful info';
     const wrapper = shallowMount(IconHelpTooltip, {
       props: { tooltip: tooltipText },
     });
 
-    const link = wrapper.find('a');
-    expect(link.exists()).toBe(true);
-    expect(link.attributes('data-tooltip')).toBe(tooltipText);
+    const button = wrapper.find('button');
+    expect(button.exists()).toBe(true);
+    expect(button.attributes('data-tooltip')).toBe(tooltipText);
   });
 
-  it('renders a link with href="#"', () => {
+  it('renders a button with aria-label matching the tooltip', () => {
+    const tooltipText = 'Some help';
     const wrapper = shallowMount(IconHelpTooltip, {
-      props: { tooltip: 'Some help' },
+      props: { tooltip: tooltipText },
     });
 
-    expect(wrapper.find('a').attributes('href')).toBe('#');
+    expect(wrapper.find('button').attributes('aria-label')).toBe(tooltipText);
   });
 });

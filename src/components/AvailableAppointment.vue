@@ -21,6 +21,12 @@ export default {
     firstTime(): string {
       return timeFormat.format((this.appointments as Date[])[0]);
     },
+    appointmentCount(): number {
+      return (this.appointments as Date[]).length;
+    },
+    appointmentLabel(): string {
+      return this.appointmentCount === 1 ? 'appointment' : 'appointments';
+    },
     visibleTimes(): string[] {
       return (this.appointments as Date[])
         .slice(0, MAX_VISIBLE_TIMES)
@@ -45,7 +51,9 @@ export default {
 
 <template>
   <details>
-    <summary>{{ date }} — first available: {{ firstTime }}</summary>
+    <summary>
+      {{ date }} — {{ appointmentCount }} {{ appointmentLabel }}, earliest at {{ firstTime }}
+    </summary>
     <ul>
       <li v-for="time in visibleTimes" :key="time">{{ time }}</li>
       <li v-if="hasMoreTimes">

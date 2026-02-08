@@ -24,7 +24,7 @@ describe('AvailableAppointment', () => {
     expect(wrapper.find('summary').exists()).toBe(true);
   });
 
-  it('shows formatted date and first available time in the summary', () => {
+  it('shows formatted date, appointment count, and earliest time in the summary', () => {
     const date = new Date('2024-01-15T10:30');
     const wrapper = mount(AvailableAppointment, {
       props: { appointments: [date, new Date('2024-01-15T11:00')] },
@@ -33,7 +33,32 @@ describe('AvailableAppointment', () => {
     const summary = wrapper.find('summary').text();
     expect(summary).toContain(dateFormat.format(date));
     expect(summary).toContain(timeFormat.format(date));
-    expect(summary).toContain('first available');
+    expect(summary).toContain('2 appointments');
+    expect(summary).toContain('earliest at');
+  });
+
+  it('uses singular "appointment" when there is exactly one', () => {
+    const date = new Date('2024-01-15T10:30');
+    const wrapper = mount(AvailableAppointment, {
+      props: { appointments: [date] },
+    });
+
+    const summary = wrapper.find('summary').text();
+    expect(summary).toContain('1 appointment,');
+  });
+
+  it('uses plural "appointments" when there are multiple', () => {
+    const appointments = [
+      new Date('2024-01-15T10:30'),
+      new Date('2024-01-15T11:00'),
+      new Date('2024-01-15T11:30'),
+    ];
+    const wrapper = mount(AvailableAppointment, {
+      props: { appointments },
+    });
+
+    const summary = wrapper.find('summary').text();
+    expect(summary).toContain('3 appointments,');
   });
 
   it('shows all times when there are 3 or fewer', () => {

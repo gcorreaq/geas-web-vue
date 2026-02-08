@@ -34,7 +34,7 @@ export default defineComponent({
     />
     Get notified
     <IconHelpTooltip
-      tooltip="Show a notification in your browser when there's new appointments availalbe"
+      tooltip="Show a notification in your browser when there's new appointments available"
     />
   </label>
 </template>

@@ -143,7 +143,10 @@ export default {
       <hgroup>
         <h5>Available appointments</h5>
         To schedule an appointment go to
-        <a href="https://ttp.cbp.dhs.gov/">https://ttp.cbp.dhs.gov/</a>
+        <a
+          href="https://ttp.cbp.dhs.gov/schedulerui/schedule-interview/location?lang=en&vo=true&returnUrl=ttp-external&service=UP"
+          >the Department of Homeland Security's website</a
+        >
       </hgroup>
       <AvailableAppointmentsList :appointments="appointments" />
     </div>

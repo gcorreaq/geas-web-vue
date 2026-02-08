@@ -22,6 +22,7 @@ interface AppData {
   currentTimeoutIntervalId: number | null;
   didFirstSearch: boolean;
   activeSearch: boolean;
+  abortController: AbortController | null;
 }
 
 export default {
@@ -40,6 +41,7 @@ export default {
     currentTimeoutIntervalId: null,
     didFirstSearch: false,
     activeSearch: false,
+    abortController: null,
   }),
 
   computed: {
@@ -66,16 +68,32 @@ export default {
       }
     },
     async fetchData() {
+      if (this.abortController) {
+        this.abortController.abort();
+      }
+      this.abortController = new AbortController();
+
       this.activeSearch = true;
       this.clearFetchDataTimeout();
       const locationId = (this.$refs.locationSelectorRef as typeof LocationsSelector)
         .currentLocationId;
       const url = `${API_URL}?orderBy=soonest&limit=1000&locationId=${locationId}&minimum=1`;
-      const response = await (await fetch(url)).json();
-      this.lastSearched = new Date();
-      this.appointments = response;
+
+      try {
+        const response = await fetch(url, { signal: this.abortController.signal });
+        const data = await response.json();
+        this.lastSearched = new Date();
+        this.appointments = data;
+        this.didFirstSearch = true;
+      } catch (e) {
+        if (e instanceof DOMException && e.name === 'AbortError') {
+          return;
+        }
+        console.error('Fetch failed:', e);
+      }
+
       this.activeSearch = false;
-      this.didFirstSearch = true;
+
       if (this.shouldAutoRetry) {
         await this.delayFetchData(DEFAULT_DELAY);
       }

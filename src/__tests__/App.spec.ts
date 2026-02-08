@@ -78,6 +78,11 @@ describe('App', () => {
       const wrapper = mountApp();
       expect(wrapper.vm.activeSearch).toBe(false);
     });
+
+    it('has abortController set to null', () => {
+      const wrapper = mountApp();
+      expect(wrapper.vm.abortController).toBeNull();
+    });
   });
 
   describe('computed properties', () => {
@@ -185,7 +190,8 @@ describe('App', () => {
       await flushPromises();
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'https://ttp.cbp.dhs.gov/schedulerapi/slots?orderBy=soonest&limit=1000&locationId=5446&minimum=1'
+        'https://ttp.cbp.dhs.gov/schedulerapi/slots?orderBy=soonest&limit=1000&locationId=5446&minimum=1',
+        { signal: expect.any(AbortSignal) }
       );
       expect(wrapper.vm.appointments).toEqual(slots);
       expect(wrapper.vm.didFirstSearch).toBe(true);
@@ -253,6 +259,91 @@ describe('App', () => {
       await flushPromises();
 
       expect(createNotification).not.toHaveBeenCalled();
+    });
+
+    it('aborts the previous in-flight request when fetchData is called again', async () => {
+      const freshSlots = [makeSlot('2024-02-01T09:00')];
+      let callCount = 0;
+
+      (global.fetch as ReturnType<typeof vi.fn>).mockImplementation(
+        (_url: string, options?: { signal?: AbortSignal }) => {
+          callCount++;
+          if (callCount === 1) {
+            return new Promise((_resolve, reject) => {
+              options?.signal?.addEventListener('abort', () => {
+                reject(new DOMException('The operation was aborted.', 'AbortError'));
+              });
+            });
+          }
+          return Promise.resolve({ json: () => Promise.resolve(freshSlots) });
+        }
+      );
+
+      const wrapper = mountApp();
+      wrapper.vm.shouldAutoRetry = false;
+
+      const firstCall = wrapper.vm.fetchData();
+      await flushPromises();
+
+      const firstController = wrapper.vm.abortController!;
+      expect(firstController.signal.aborted).toBe(false);
+
+      const secondCall = wrapper.vm.fetchData();
+      expect(firstController.signal.aborted).toBe(true);
+
+      await firstCall;
+      await secondCall;
+      await flushPromises();
+
+      expect(wrapper.vm.appointments).toEqual(freshSlots);
+      expect(wrapper.vm.activeSearch).toBe(false);
+    });
+
+    it('resets activeSearch to false when fetch throws a network error', async () => {
+      (global.fetch as ReturnType<typeof vi.fn>).mockRejectedValue(
+        new TypeError('Failed to fetch')
+      );
+
+      const wrapper = mountApp();
+      wrapper.vm.shouldAutoRetry = false;
+      const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      await wrapper.vm.fetchData();
+      await flushPromises();
+
+      expect(wrapper.vm.activeSearch).toBe(false);
+      expect(wrapper.vm.appointments).toEqual([]);
+      expect(consoleSpy).toHaveBeenCalled();
+    });
+
+    it('does not update appointments when fetch is aborted', async () => {
+      const abortError = new DOMException('The operation was aborted.', 'AbortError');
+      (global.fetch as ReturnType<typeof vi.fn>).mockRejectedValue(abortError);
+
+      const wrapper = mountApp();
+      wrapper.vm.shouldAutoRetry = false;
+      wrapper.vm.appointments = [makeSlot('2024-01-01T08:00')];
+
+      await wrapper.vm.fetchData();
+      await flushPromises();
+
+      expect(wrapper.vm.appointments).toEqual([makeSlot('2024-01-01T08:00')]);
+    });
+
+    it('passes an AbortSignal to fetch', async () => {
+      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+        json: () => Promise.resolve([]),
+      });
+
+      const wrapper = mountApp();
+      wrapper.vm.shouldAutoRetry = false;
+
+      await wrapper.vm.fetchData();
+      await flushPromises();
+
+      const fetchCall = (global.fetch as ReturnType<typeof vi.fn>).mock.calls[0];
+      expect(fetchCall[1]).toHaveProperty('signal');
+      expect(fetchCall[1].signal).toBeInstanceOf(AbortSignal);
     });
   });
 

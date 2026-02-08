@@ -145,7 +145,7 @@ export default {
         To schedule an appointment go to
         <a
           href="https://ttp.cbp.dhs.gov/schedulerui/schedule-interview/location?lang=en&vo=true&returnUrl=ttp-external&service=UP"
-          >https://ttp.cbp.dhs.gov/schedulerui/schedule-interview/location?lang=en&vo=true&returnUrl=ttp-external&service=UP</a
+          >the Department of Homeland Security's website</a
         >
       </hgroup>
       <AvailableAppointmentsList :appointments="appointments" />

@@ -2,23 +2,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { createNotification } from '../notificationsBuilder';
 import type { ApiAvailableSlots } from '../apiTypes';
 
-vi.mock('i18next', () => ({
-  default: {
-    t: (key: string, options?: { count: number }) => {
-      const count = options?.count ?? 0;
-      if (key === 'appointmentNotifications.title') {
-        if (count === 1) return 'Appointment available!';
-        return 'Appointments available!';
-      }
-      if (key === 'appointmentNotifications.body') {
-        if (count === 1) return '1 appointment is available';
-        return `${count} appointments are available`;
-      }
-      return key;
-    },
-  },
-}));
-
 function makeSlot(overrides: Partial<ApiAvailableSlots> = {}): ApiAvailableSlots {
   return {
     locationId: 5446,

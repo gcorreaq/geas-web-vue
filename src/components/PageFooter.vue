@@ -1,19 +1,8 @@
-<script lang="ts">
+<script setup lang="ts">
 import SvgIcon from '@jamescoyle/vue-icon';
 import { mdiGithub } from '@mdi/js';
 
-interface PageFooterComponentData {
-  githubIconSvgPath: string;
-}
-
-export default {
-  components: {
-    SvgIcon,
-  },
-  data: (): PageFooterComponentData => ({
-    githubIconSvgPath: mdiGithub,
-  }),
-};
+const githubIconSvgPath = mdiGithub;
 </script>
 
 <template>

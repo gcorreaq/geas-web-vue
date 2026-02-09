@@ -1,65 +1,54 @@
-<script lang="ts">
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
+
 const DEFAULT_INTERVAL = 1000;
 
-interface RetryCountdownData {
-  secondsLeft: number;
-  countdownIntervalId: number | null;
+const props = defineProps<{
+  totalSeconds: number;
+}>();
+
+const secondsLeft = ref(props.totalSeconds);
+const countdownIntervalId = ref<number | null>(null);
+
+const unitLabel = computed(() => (secondsLeft.value === 1 ? 'second' : 'seconds'));
+
+function startCountdown() {
+  countdownIntervalId.value = setInterval(() => {
+    secondsLeft.value--;
+    if (secondsLeft.value <= 0) {
+      stopCountdown();
+    }
+  }, DEFAULT_INTERVAL);
 }
 
-export default {
-  props: {
-    totalSeconds: {
-      type: Number,
-      required: true,
-    },
-  },
+function stopCountdown() {
+  if (countdownIntervalId.value) {
+    clearInterval(countdownIntervalId.value);
+    countdownIntervalId.value = null;
+  }
+}
 
-  data(): RetryCountdownData {
-    return {
-      secondsLeft: this.totalSeconds,
-      countdownIntervalId: null,
-    };
-  },
+onMounted(() => {
+  startCountdown();
+});
 
-  computed: {
-    unitLabel(): string {
-      return this.secondsLeft === 1 ? 'second' : 'seconds';
-    },
-  },
+onBeforeUnmount(() => {
+  stopCountdown();
+});
 
-  mounted() {
-    this.startCountdown();
+watch(
+  () => props.totalSeconds,
+  (newVal) => {
+    stopCountdown();
+    secondsLeft.value = newVal;
+    startCountdown();
   },
+);
 
-  beforeUnmount() {
-    this.stopCountdown();
-  },
-
-  watch: {
-    totalSeconds(newVal: number) {
-      this.stopCountdown();
-      this.secondsLeft = newVal;
-      this.startCountdown();
-    },
-  },
-
-  methods: {
-    startCountdown() {
-      this.countdownIntervalId = setInterval(() => {
-        this.secondsLeft--;
-        if (this.secondsLeft <= 0) {
-          this.stopCountdown();
-        }
-      }, DEFAULT_INTERVAL);
-    },
-    stopCountdown() {
-      if (this.countdownIntervalId) {
-        clearInterval(this.countdownIntervalId);
-        this.countdownIntervalId = null;
-      }
-    },
-  },
-};
+defineExpose({
+  secondsLeft,
+  countdownIntervalId,
+});
 </script>
 
 <template>

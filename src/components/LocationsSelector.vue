@@ -1,16 +1,16 @@
-<script lang="ts">
+<script setup lang="ts">
+import { ref } from 'vue';
 import LocationsData from '../assets/locations.json';
 
 const DEFAULT_LOCATION_ID = 5446; // San Francisco Enrollment Center
 
-export default {
-  data() {
-    return {
-      locations: LocationsData.sort((a, b) => (a.name > b.name ? 1 : -1)),
-      currentLocationId: DEFAULT_LOCATION_ID,
-    };
-  },
-};
+const locations = LocationsData.sort((a, b) => (a.name > b.name ? 1 : -1));
+const currentLocationId = ref(DEFAULT_LOCATION_ID);
+
+defineExpose({
+  locations,
+  currentLocationId,
+});
 </script>
 
 <template>

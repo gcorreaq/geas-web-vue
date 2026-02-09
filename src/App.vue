@@ -1,9 +1,10 @@
 <!--
-This example fetches latest Vue.js commits data from GitHub’s API and displays them as a list.
+This example fetches latest Vue.js commits data from GitHub's API and displays them as a list.
 You can switch between the two branches.
 -->
 
-<script lang="ts">
+<script setup lang="ts">
+import { ref, computed } from 'vue';
 import AvailableAppointmentsList from './components/AvailableAppointmentsList.vue';
 import IconHelpTooltip from './components/icons/IconHelpTooltip.vue';
 import LocationsSelector from './components/LocationsSelector.vue';
@@ -18,107 +19,94 @@ const API_URL = `https://ttp.cbp.dhs.gov/schedulerapi/slots`;
 const DEFAULT_DELAY = 60000; // 1 minute
 const DEFAULT_DELAY_SECONDS = DEFAULT_DELAY / 1000;
 
-interface AppData {
-  appointments: Array<ApiAvailableSlots>;
-  shouldAutoRetry: boolean;
-  lastSearched: Date | null;
-  currentTimeoutIntervalId: number | null;
-  didFirstSearch: boolean;
-  activeSearch: boolean;
+const appointments = ref<ApiAvailableSlots[]>([]);
+const shouldAutoRetry = ref(true);
+const lastSearched = ref<Date | null>(null);
+const currentTimeoutIntervalId = ref<number | null>(null);
+const didFirstSearch = ref(false);
+const activeSearch = ref(false);
+
+const locationSelectorRef = ref<InstanceType<typeof LocationsSelector> | null>(null);
+const notificationCheckboxRef = ref<InstanceType<typeof NotificationCheckbox> | null>(null);
+
+const lastSearchDate = computed(() => lastSearched.value?.toLocaleString() || '--');
+const hasAvailableAppointments = computed(() => appointments.value.length > 0);
+const searchButtonClass = computed(() => (activeSearch.value ? 'secondary' : ''));
+const searchButtonText = computed(() => (activeSearch.value ? 'Searching...' : 'Search'));
+const defaultDelaySeconds = DEFAULT_DELAY_SECONDS;
+
+function clearFetchDataTimeout() {
+  if (currentTimeoutIntervalId.value) {
+    console.log('Clearing timeouts');
+    clearTimeout(currentTimeoutIntervalId.value);
+    currentTimeoutIntervalId.value = null;
+  }
 }
 
-export default {
-  components: {
-    AvailableAppointmentsList,
-    IconHelpTooltip,
-    LocationsSelector,
-    NotificationCheckbox,
-    PageFooter,
-    RetryCountdown,
-  },
+async function fetchData() {
+  activeSearch.value = true;
+  clearFetchDataTimeout();
+  const locationId = locationSelectorRef.value?.currentLocationId;
+  const url = `${API_URL}?orderBy=soonest&limit=1000&locationId=${locationId}&minimum=1`;
 
-  data: (): AppData => ({
-    appointments: [],
-    shouldAutoRetry: true,
-    lastSearched: null,
-    currentTimeoutIntervalId: null,
-    didFirstSearch: false,
-    activeSearch: false,
-  }),
+  const result = await abortableFetch<ApiAvailableSlots[]>(url);
 
-  computed: {
-    lastSearchDate() {
-      return this.lastSearched?.toLocaleString() || '--';
-    },
-    hasAvailableAppointments() {
-      return this.appointments.length > 0;
-    },
-    searchButtonClass() {
-      return this.activeSearch ? 'secondary' : '';
-    },
-    searchButtonText() {
-      return this.activeSearch ? 'Searching...' : 'Search';
-    },
-    defaultDelaySeconds() {
-      return DEFAULT_DELAY_SECONDS;
-    },
-  },
+  if (!result.ok) {
+    if (result.aborted) return;
+  } else {
+    lastSearched.value = new Date();
+    appointments.value = result.data;
+    didFirstSearch.value = true;
+  }
 
-  methods: {
-    clearFetchDataTimeout() {
-      if (this.currentTimeoutIntervalId) {
-        console.log('Clearing timeouts');
-        clearTimeout(this.currentTimeoutIntervalId);
-        this.currentTimeoutIntervalId = null;
-      }
-    },
-    async fetchData() {
-      this.activeSearch = true;
-      this.clearFetchDataTimeout();
-      const locationId = (this.$refs.locationSelectorRef as typeof LocationsSelector)
-        .currentLocationId;
-      const url = `${API_URL}?orderBy=soonest&limit=1000&locationId=${locationId}&minimum=1`;
+  activeSearch.value = false;
 
-      const result = await abortableFetch<ApiAvailableSlots[]>(url);
+  if (shouldAutoRetry.value) {
+    await delayFetchData(DEFAULT_DELAY);
+  }
 
-      if (!result.ok) {
-        if (result.aborted) return;
-      } else {
-        this.lastSearched = new Date();
-        this.appointments = result.data;
-        this.didFirstSearch = true;
-      }
+  if (hasAvailableAppointments.value) {
+    await sendNotification();
+  }
+}
 
-      this.activeSearch = false;
+async function sendNotification() {
+  if (notificationCheckboxRef.value?.notificationsEnabled) {
+    createNotification(appointments.value);
+  }
+}
 
-      if (this.shouldAutoRetry) {
-        await this.delayFetchData(DEFAULT_DELAY);
-      }
+async function changeAutoRetry() {
+  if (!shouldAutoRetry.value) {
+    clearFetchDataTimeout();
+  }
+}
 
-      if (this.hasAvailableAppointments) {
-        await this.sendNotification();
-      }
-    },
-    async sendNotification() {
-      if (
-        (this.$refs.notificationCheckboxRef as typeof NotificationCheckbox).notificationsEnabled
-      ) {
-        createNotification(this.appointments);
-      }
-    },
-    async changeAutoRetry() {
-      if (!this.shouldAutoRetry) {
-        this.clearFetchDataTimeout();
-      }
-    },
-    async delayFetchData(time: number) {
-      this.clearFetchDataTimeout();
-      this.currentTimeoutIntervalId = setTimeout(async () => {
-        await this.fetchData();
-      }, time);
-    },
-  },
-};
+async function delayFetchData(time: number) {
+  clearFetchDataTimeout();
+  currentTimeoutIntervalId.value = setTimeout(async () => {
+    await fetchData();
+  }, time);
+}
+
+defineExpose({
+  appointments,
+  shouldAutoRetry,
+  lastSearched,
+  currentTimeoutIntervalId,
+  didFirstSearch,
+  activeSearch,
+  lastSearchDate,
+  hasAvailableAppointments,
+  searchButtonClass,
+  searchButtonText,
+  defaultDelaySeconds,
+  clearFetchDataTimeout,
+  fetchData,
+  sendNotification,
+  changeAutoRetry,
+  delayFetchData,
+});
 </script>
 
 <template>

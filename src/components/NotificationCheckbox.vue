@@ -1,25 +1,17 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue';
 import IconHelpTooltip from './icons/IconHelpTooltip.vue';
 
-export default defineComponent({
-  components: {
-    IconHelpTooltip,
-  },
+const notificationsEnabled = ref(false);
 
-  data() {
-    return {
-      notificationsEnabled: false,
-    };
-  },
+async function changeNotifications() {
+  if (notificationsEnabled.value && Notification.permission !== 'denied') {
+    await Notification.requestPermission();
+  }
+}
 
-  methods: {
-    async changeNotifications() {
-      if (this.notificationsEnabled && Notification.permission !== 'denied') {
-        await Notification.requestPermission();
-      }
-    },
-  },
+defineExpose({
+  notificationsEnabled,
 });
 </script>
 

@@ -3,6 +3,11 @@ import { shallowMount, flushPromises } from '@vue/test-utils';
 import App from '../App.vue';
 import type { ApiAvailableSlots } from '../apiTypes';
 
+const mockAbortableFetch = vi.hoisted(() => vi.fn());
+vi.mock('../abortableFetch', () => ({
+  abortableFetch: mockAbortableFetch,
+}));
+
 vi.mock('../notificationsBuilder', () => ({
   createNotification: vi.fn(),
 }));
@@ -21,7 +26,7 @@ function makeSlot(startTimestamp = '2024-01-15T10:30'): ApiAvailableSlots {
 describe('App', () => {
   beforeEach(() => {
     vi.useFakeTimers();
-    global.fetch = vi.fn();
+    mockAbortableFetch.mockReset();
   });
 
   afterEach(() => {
@@ -174,9 +179,7 @@ describe('App', () => {
   describe('fetchData', () => {
     it('fetches data from the API and updates appointments', async () => {
       const slots = [makeSlot()];
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
-        json: () => Promise.resolve(slots),
-      });
+      mockAbortableFetch.mockResolvedValue({ ok: true, data: slots });
 
       const wrapper = mountApp();
       wrapper.vm.shouldAutoRetry = false;
@@ -184,7 +187,7 @@ describe('App', () => {
       await wrapper.vm.fetchData();
       await flushPromises();
 
-      expect(global.fetch).toHaveBeenCalledWith(
+      expect(mockAbortableFetch).toHaveBeenCalledWith(
         'https://ttp.cbp.dhs.gov/schedulerapi/slots?orderBy=soonest&limit=1000&locationId=5446&minimum=1'
       );
       expect(wrapper.vm.appointments).toEqual(slots);
@@ -194,9 +197,7 @@ describe('App', () => {
     });
 
     it('sets appointments to empty array when API returns no slots', async () => {
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
-        json: () => Promise.resolve([]),
-      });
+      mockAbortableFetch.mockResolvedValue({ ok: true, data: [] });
 
       const wrapper = mountApp();
       wrapper.vm.shouldAutoRetry = false;
@@ -208,9 +209,7 @@ describe('App', () => {
     });
 
     it('schedules auto-retry when shouldAutoRetry is true', async () => {
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
-        json: () => Promise.resolve([]),
-      });
+      mockAbortableFetch.mockResolvedValue({ ok: true, data: [] });
 
       const wrapper = mountApp();
       wrapper.vm.shouldAutoRetry = true;
@@ -225,9 +224,7 @@ describe('App', () => {
       const { createNotification } = await import('../notificationsBuilder');
       vi.mocked(createNotification).mockClear();
       const slots = [makeSlot()];
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
-        json: () => Promise.resolve(slots),
-      });
+      mockAbortableFetch.mockResolvedValue({ ok: true, data: slots });
 
       const wrapper = mountApp(true);
       wrapper.vm.shouldAutoRetry = false;
@@ -241,10 +238,7 @@ describe('App', () => {
     it('does not send notification when notifications are disabled', async () => {
       const { createNotification } = await import('../notificationsBuilder');
       vi.mocked(createNotification).mockClear();
-
-      (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
-        json: () => Promise.resolve([makeSlot()]),
-      });
+      mockAbortableFetch.mockResolvedValue({ ok: true, data: [makeSlot()] });
 
       const wrapper = mountApp(false);
       wrapper.vm.shouldAutoRetry = false;
@@ -253,6 +247,45 @@ describe('App', () => {
       await flushPromises();
 
       expect(createNotification).not.toHaveBeenCalled();
+    });
+
+    it('does not update state when fetch is aborted', async () => {
+      mockAbortableFetch.mockResolvedValue({ ok: false, aborted: true });
+
+      const wrapper = mountApp();
+      wrapper.vm.shouldAutoRetry = false;
+      wrapper.vm.appointments = [makeSlot('2024-01-01T08:00')];
+
+      await wrapper.vm.fetchData();
+      await flushPromises();
+
+      expect(wrapper.vm.appointments).toEqual([makeSlot('2024-01-01T08:00')]);
+      expect(wrapper.vm.didFirstSearch).toBe(false);
+    });
+
+    it('resets activeSearch to false when fetch fails', async () => {
+      mockAbortableFetch.mockResolvedValue({ ok: false, aborted: false });
+
+      const wrapper = mountApp();
+      wrapper.vm.shouldAutoRetry = false;
+
+      await wrapper.vm.fetchData();
+      await flushPromises();
+
+      expect(wrapper.vm.activeSearch).toBe(false);
+      expect(wrapper.vm.appointments).toEqual([]);
+    });
+
+    it('schedules auto-retry on fetch failure', async () => {
+      mockAbortableFetch.mockResolvedValue({ ok: false, aborted: false });
+
+      const wrapper = mountApp();
+      wrapper.vm.shouldAutoRetry = true;
+
+      await wrapper.vm.fetchData();
+      await flushPromises();
+
+      expect(wrapper.vm.currentTimeoutIntervalId).not.toBeNull();
     });
   });
 

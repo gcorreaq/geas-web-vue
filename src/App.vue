@@ -11,6 +11,7 @@ import NotificationCheckbox from './components/NotificationCheckbox.vue';
 import PageFooter from './components/PageFooter.vue';
 import type { ApiAvailableSlots } from './apiTypes';
 import { createNotification } from './notificationsBuilder';
+import { abortableFetch } from './abortableFetch';
 
 const API_URL = `https://ttp.cbp.dhs.gov/schedulerapi/slots`;
 const DEFAULT_DELAY = 60000; // 1 minute
@@ -71,11 +72,19 @@ export default {
       const locationId = (this.$refs.locationSelectorRef as typeof LocationsSelector)
         .currentLocationId;
       const url = `${API_URL}?orderBy=soonest&limit=1000&locationId=${locationId}&minimum=1`;
-      const response = await (await fetch(url)).json();
-      this.lastSearched = new Date();
-      this.appointments = response;
+
+      const result = await abortableFetch<ApiAvailableSlots[]>(url);
+
+      if (!result.ok) {
+        if (result.aborted) return;
+      } else {
+        this.lastSearched = new Date();
+        this.appointments = result.data;
+        this.didFirstSearch = true;
+      }
+
       this.activeSearch = false;
-      this.didFirstSearch = true;
+
       if (this.shouldAutoRetry) {
         await this.delayFetchData(DEFAULT_DELAY);
       }

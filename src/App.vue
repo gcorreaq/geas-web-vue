@@ -9,12 +9,14 @@ import IconHelpTooltip from './components/icons/IconHelpTooltip.vue';
 import LocationsSelector from './components/LocationsSelector.vue';
 import NotificationCheckbox from './components/NotificationCheckbox.vue';
 import PageFooter from './components/PageFooter.vue';
+import RetryCountdown from './components/RetryCountdown.vue';
 import type { ApiAvailableSlots } from './apiTypes';
 import { createNotification } from './notificationsBuilder';
 import { abortableFetch } from './abortableFetch';
 
 const API_URL = `https://ttp.cbp.dhs.gov/schedulerapi/slots`;
 const DEFAULT_DELAY = 60000; // 1 minute
+const DEFAULT_DELAY_SECONDS = DEFAULT_DELAY / 1000;
 
 interface AppData {
   appointments: Array<ApiAvailableSlots>;
@@ -32,6 +34,7 @@ export default {
     LocationsSelector,
     NotificationCheckbox,
     PageFooter,
+    RetryCountdown,
   },
 
   data: (): AppData => ({
@@ -55,6 +58,9 @@ export default {
     },
     searchButtonText() {
       return this.activeSearch ? 'Searching...' : 'Search';
+    },
+    defaultDelaySeconds() {
+      return DEFAULT_DELAY_SECONDS;
     },
   },
 
@@ -109,7 +115,7 @@ export default {
       this.clearFetchDataTimeout();
       this.currentTimeoutIntervalId = setTimeout(async () => {
         await this.fetchData();
-      }, time); // 1 minute
+      }, time);
     },
   },
 };
@@ -170,9 +176,10 @@ export default {
       >
     </div>
     <div v-if="didFirstSearch">
-      <small v-if="shouldAutoRetry && currentTimeoutIntervalId">
-        Auto-retry is activated. Searching again in ~60 seconds...
-      </small>
+      <RetryCountdown
+        v-if="shouldAutoRetry && currentTimeoutIntervalId"
+        :total-seconds="defaultDelaySeconds"
+      />
     </div>
   </div>
   <PageFooter />

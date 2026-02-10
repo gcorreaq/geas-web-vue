@@ -78,7 +78,7 @@ describe('abortableFetch', () => {
           });
         }
         return Promise.resolve({ json: () => Promise.resolve(freshData) });
-      }
+      },
     );
 
     const firstCall = abortableFetch('https://example.com/api');

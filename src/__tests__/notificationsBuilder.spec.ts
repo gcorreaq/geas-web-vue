@@ -52,7 +52,7 @@ describe('notificationsBuilder', () => {
 
       createNotification([makeSlot()]);
       expect(NotificationSpy).not.toHaveBeenCalled();
-    }
+    },
   );
 
   it('passes correct count for multiple appointments', () => {

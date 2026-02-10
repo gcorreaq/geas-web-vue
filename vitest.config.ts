@@ -9,5 +9,5 @@ export default mergeConfig(
       environment: 'jsdom',
       root: fileURLToPath(new URL('./', import.meta.url)),
     },
-  })
+  }),
 );

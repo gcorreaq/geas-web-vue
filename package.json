@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@jamescoyle/vue-icon": "^0.1.2",
-    "@mdi/js": "^7.2.96",
+    "@mdi/js": "^7.4.47",
     "vue": "^3.5.28"
   },
   "devDependencies": {

@@ -188,7 +188,7 @@ describe('App', () => {
       await flushPromises();
 
       expect(mockAbortableFetch).toHaveBeenCalledWith(
-        'https://ttp.cbp.dhs.gov/schedulerapi/slots?orderBy=soonest&limit=1000&locationId=5446&minimum=1'
+        'https://ttp.cbp.dhs.gov/schedulerapi/slots?orderBy=soonest&limit=1000&locationId=5446&minimum=1',
       );
       expect(wrapper.vm.appointments).toEqual(slots);
       expect(wrapper.vm.didFirstSearch).toBe(true);

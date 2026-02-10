@@ -18,7 +18,7 @@
   "dependencies": {
     "@jamescoyle/vue-icon": "^0.1.2",
     "@mdi/js": "^7.2.96",
-    "vue": "^3.3.2"
+    "vue": "^3.5.28"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.0",

@@ -11,3 +11,23 @@ updates:
       interval: 'weekly'
     assignees:
       - 'gcorreaq'
+    groups:
+      # Group ESLint/Prettier packages together to avoid peer dependency conflicts
+      linting:
+        patterns:
+          - 'eslint'
+          - 'eslint-*'
+          - '@vue/eslint-config-*'
+          - 'prettier'
+      # Group TypeScript tooling together
+      typescript:
+        patterns:
+          - 'typescript'
+          - 'vue-tsc'
+          - '@vue/tsconfig'
+      # Group testing packages together
+      testing:
+        patterns:
+          - 'vitest'
+          - '@vue/test-utils'
+          - 'jsdom'

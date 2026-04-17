@@ -11,6 +11,8 @@ updates:
       interval: 'weekly'
     assignees:
       - 'gcorreaq'
+    allow:
+      - dependency-type: 'direct'
     groups:
       # Group ESLint/Prettier packages together to avoid peer dependency conflicts
       linting:

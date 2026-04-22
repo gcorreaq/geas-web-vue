@@ -3,6 +3,8 @@
   "include": ["src/apiTypes.ts", "src/notificationsBuilder.ts", "src/abortableFetch.ts"],
   "compilerOptions": {
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "erasableSyntaxOnly": true,
+    "noUncheckedSideEffectImports": true,
     "paths": {
       "@/*": ["./src/*"]
     }

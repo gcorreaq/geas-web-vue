@@ -5,6 +5,8 @@
     "composite": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "erasableSyntaxOnly": true,
+    "noUncheckedSideEffectImports": true,
     "types": ["node"]
   }
 }

@@ -8,6 +8,7 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit -p tsconfig.app.json --composite false",
+    "type-check:native": "tsgo --noEmit -p tsconfig.ts-only.json && tsgo --noEmit -p tsconfig.node.json",
     "lint": "eslint --fix",
     "format": "prettier --write .",
     "test": "vitest run --passWithNoTests",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@tsconfig/node24": "^24.0.0",
     "@types/node": "^25.6.0",
+    "@typescript/native-preview": "^7.0.0-dev.20260421.2",
     "@vitejs/plugin-vue": "^6.0.4",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.7.0",
@@ -38,6 +40,6 @@
     "typescript": "~6.0.3",
     "vite": "^7.3.2",
     "vitest": "^4.1.4",
-    "vue-tsc": "^3.2.6"
+    "vue-tsc": "^3.2.7"
   }
 }

@@ -10,7 +10,7 @@ const path = mdiHelpCircleOutline;
 </script>
 
 <template>
-  <button type="button" :data-tooltip="tooltip" :aria-label="tooltip" class="outline">
+  <a href="#" role="button" :data-tooltip="tooltip" :aria-label="tooltip" @click.prevent>
     <svg-icon type="mdi" :path="path" aria-hidden="true"></svg-icon>
-  </button>
+  </a>
 </template>

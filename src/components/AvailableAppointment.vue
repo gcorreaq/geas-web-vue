@@ -1,4 +1,6 @@
-<script lang="ts">
+<script setup lang="ts">
+import { computed } from 'vue';
+
 const dateFormat = new Intl.DateTimeFormat(undefined, {
   weekday: 'long',
   year: 'numeric',
@@ -13,40 +15,24 @@ const timeFormat = new Intl.DateTimeFormat(undefined, {
 
 const MAX_VISIBLE_TIMES = 3;
 
-export default {
-  computed: {
-    date(): string {
-      return dateFormat.format((this.appointments as Date[])[0]);
-    },
-    firstTime(): string {
-      return timeFormat.format((this.appointments as Date[])[0]);
-    },
-    appointmentCount(): number {
-      return (this.appointments as Date[]).length;
-    },
-    appointmentLabel(): string {
-      return this.appointmentCount === 1 ? 'appointment' : 'appointments';
-    },
-    visibleTimes(): string[] {
-      return (this.appointments as Date[])
-        .slice(0, MAX_VISIBLE_TIMES)
-        .map((d) => timeFormat.format(d));
-    },
-    hiddenTimes(): string[] {
-      return (this.appointments as Date[])
-        .slice(MAX_VISIBLE_TIMES)
-        .map((d) => timeFormat.format(d));
-    },
-    hasMoreTimes(): boolean {
-      return (this.appointments as Date[]).length > MAX_VISIBLE_TIMES;
-    },
-    moreCount(): number {
-      return (this.appointments as Date[]).length - MAX_VISIBLE_TIMES;
-    },
-  },
+const props = defineProps<{
+  appointments: Date[];
+}>();
 
-  props: ['appointments'],
-};
+const date = computed(() => dateFormat.format(props.appointments[0]));
+const firstTime = computed(() => timeFormat.format(props.appointments[0]));
+const appointmentCount = computed(() => props.appointments.length);
+const appointmentLabel = computed(() =>
+  appointmentCount.value === 1 ? 'appointment' : 'appointments',
+);
+const visibleTimes = computed(() =>
+  props.appointments.slice(0, MAX_VISIBLE_TIMES).map((d) => timeFormat.format(d)),
+);
+const hiddenTimes = computed(() =>
+  props.appointments.slice(MAX_VISIBLE_TIMES).map((d) => timeFormat.format(d)),
+);
+const hasMoreTimes = computed(() => props.appointments.length > MAX_VISIBLE_TIMES);
+const moreCount = computed(() => props.appointments.length - MAX_VISIBLE_TIMES);
 </script>
 
 <template>

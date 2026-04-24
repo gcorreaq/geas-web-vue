@@ -140,20 +140,18 @@ defineExpose({
       </div>
     </div>
     <div class="grid" id="activeSearchBanner" v-if="activeSearch">
-      <div role="status" aria-busy="true">Searching for appointments…</div>
+      <div role="status" aria-busy="true" aria-label="Searching for appointments"></div>
     </div>
     <div class="grid" id="results" aria-live="polite" v-if="didFirstSearch && !activeSearch">
       <div id="availableResults" v-if="hasAvailableAppointments">
-        <div>
+        <hgroup>
           <h5>Available appointments</h5>
-          <p>
-            To schedule an appointment go to
-            <a
-              href="https://ttp.cbp.dhs.gov/schedulerui/schedule-interview/location?lang=en&vo=true&returnUrl=ttp-external&service=UP"
-              >the Department of Homeland Security's website</a
-            >
-          </p>
-        </div>
+          To schedule an appointment go to
+          <a
+            href="https://ttp.cbp.dhs.gov/schedulerui/schedule-interview/location?lang=en&vo=true&returnUrl=ttp-external&service=UP"
+            >the Department of Homeland Security's website</a
+          >
+        </hgroup>
         <AvailableAppointmentsList :appointments="appointments" />
       </div>
       <div id="noResults" v-else>

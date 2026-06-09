@@ -55,6 +55,11 @@ updates:
       day: 'monday'
     assignees:
       - 'gcorreaq'
+    ignore:
+      - dependency-name: '*'
+        update-types:
+          - 'version-update:semver-minor'
+          - 'version-update:semver-patch'
     groups:
       # Group all GitHub Actions together for a single review PR
       github-actions:

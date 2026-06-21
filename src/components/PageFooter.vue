@@ -11,7 +11,7 @@ const githubIconSvgPath = mdiGithub;
       <small>
         <a href="https://github.com/gcorreaq/geas-web-vue"
           >geas-web-vue
-          <svg-icon type="mdi" :path="githubIconSvgPath"></svg-icon>
+          <svg-icon type="mdi" :path="githubIconSvgPath" aria-hidden="true"></svg-icon>
         </a>
       </small>
     </div>

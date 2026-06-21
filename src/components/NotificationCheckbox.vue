@@ -23,10 +23,14 @@ defineExpose({
       v-model="notificationsEnabled"
       id="shouldSendNotifications"
       role="switch"
+      aria-describedby="notificationHelpText"
     />
     Get notified
     <IconHelpTooltip
       tooltip="Show a notification in your browser when there's new appointments available"
     />
+    <span id="notificationHelpText" hidden
+      >Show a notification in your browser when there's new appointments available</span
+    >
   </label>
 </template>

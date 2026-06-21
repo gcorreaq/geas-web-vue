@@ -14,11 +14,12 @@ describe('IconHelpTooltip', () => {
     expect(link.attributes('data-tooltip')).toBe(tooltipText);
   });
 
-  it('renders a link with href="#"', () => {
+  it('renders a link with aria-label matching the tooltip', () => {
+    const tooltipText = 'Some help';
     const wrapper = shallowMount(IconHelpTooltip, {
-      props: { tooltip: 'Some help' },
+      props: { tooltip: tooltipText },
     });
 
-    expect(wrapper.find('a').attributes('href')).toBe('#');
+    expect(wrapper.find('a').attributes('aria-label')).toBe(tooltipText);
   });
 });

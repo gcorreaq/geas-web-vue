@@ -110,67 +110,69 @@ defineExpose({
 </script>
 
 <template>
-  <div class="grid">
-    <div>
-      <h4>Global Entry Appointment Search</h4>
-      <form @submit.prevent>
-        <LocationsSelector ref="locationSelectorRef" />
-        <button
-          @click="fetchData"
-          :aria-busy="activeSearch"
-          :class="searchButtonClass"
-          :disabled="activeSearch"
+  <main>
+    <div class="grid">
+      <div>
+        <h4>Global Entry Appointment Search</h4>
+        <form @submit.prevent>
+          <LocationsSelector ref="locationSelectorRef" />
+          <button
+            @click="fetchData"
+            :aria-busy="activeSearch"
+            :class="searchButtonClass"
+            :disabled="activeSearch"
+          >
+            {{ searchButtonText }}
+          </button>
+          <label for="shouldAutoRetry">
+            <input
+              @change="changeAutoRetry"
+              type="checkbox"
+              v-model="shouldAutoRetry"
+              id="shouldAutoRetry"
+              role="switch"
+            />
+            Auto retry
+            <IconHelpTooltip tooltip="Automatically do a new search every ~60 seconds" />
+          </label>
+          <NotificationCheckbox ref="notificationCheckboxRef" />
+        </form>
+      </div>
+    </div>
+    <div class="grid" id="activeSearchBanner" v-if="activeSearch">
+      <div role="status" aria-busy="true" aria-label="Searching for appointments"></div>
+    </div>
+    <div class="grid" id="results" aria-live="polite" v-if="didFirstSearch && !activeSearch">
+      <div id="availableResults" v-if="hasAvailableAppointments">
+        <hgroup>
+          <h5>Available appointments</h5>
+          To schedule an appointment go to
+          <a
+            href="https://ttp.cbp.dhs.gov/schedulerui/schedule-interview/location?lang=en&vo=true&returnUrl=ttp-external&service=UP"
+            >the Department of Homeland Security's website</a
+          >
+        </hgroup>
+        <AvailableAppointmentsList :appointments="appointments" />
+      </div>
+      <div id="noResults" v-else>
+        <h2>No results found</h2>
+      </div>
+    </div>
+    <div class="grid" aria-live="polite">
+      <div v-if="didFirstSearch">
+        <small
+          ><em>Last searched on {{ lastSearchDate }}</em></small
         >
-          {{ searchButtonText }}
-        </button>
-        <label for="shouldAutoRetry">
-          <input
-            @change="changeAutoRetry"
-            type="checkbox"
-            v-model="shouldAutoRetry"
-            id="shouldAutoRetry"
-            role="switch"
-          />
-          Auto retry
-          <IconHelpTooltip tooltip="Automatically do a new search every ~60 seconds" />
-        </label>
-        <NotificationCheckbox ref="notificationCheckboxRef" />
-      </form>
+      </div>
+      <div v-if="didFirstSearch">
+        <RetryCountdown
+          v-if="shouldAutoRetry && currentTimeoutIntervalId"
+          :total-seconds="defaultDelaySeconds"
+        />
+      </div>
     </div>
-  </div>
-  <div class="grid" id="activeSearchBanner" v-if="activeSearch">
-    <div aria-busy="true"></div>
-  </div>
-  <div class="grid" id="results" v-if="didFirstSearch && !activeSearch">
-    <div id="availableResults" v-if="hasAvailableAppointments">
-      <hgroup>
-        <h5>Available appointments</h5>
-        To schedule an appointment go to
-        <a
-          href="https://ttp.cbp.dhs.gov/schedulerui/schedule-interview/location?lang=en&vo=true&returnUrl=ttp-external&service=UP"
-          >the Department of Homeland Security's website</a
-        >
-      </hgroup>
-      <AvailableAppointmentsList :appointments="appointments" />
-    </div>
-    <div id="noResults" v-else>
-      <h2>No results found</h2>
-    </div>
-  </div>
-  <div class="grid">
-    <div v-if="didFirstSearch">
-      <small
-        ><em>Last searched on {{ lastSearchDate }}</em></small
-      >
-    </div>
-    <div v-if="didFirstSearch">
-      <RetryCountdown
-        v-if="shouldAutoRetry && currentTimeoutIntervalId"
-        :total-seconds="defaultDelaySeconds"
-      />
-    </div>
-  </div>
-  <PageFooter />
+    <PageFooter />
+  </main>
 </template>
 
 <style></style>
